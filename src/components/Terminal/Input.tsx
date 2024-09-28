@@ -1,5 +1,7 @@
 import { FC, useEffect, useRef, useState } from "react";
 
+import CommandPrompt from "../ComandPrompt";
+
 interface InputProps {
   onSubmit: (command: string) => void;
   isFocused: boolean;
@@ -10,7 +12,6 @@ const Input: FC<InputProps> = ({ onSubmit, isFocused }) => {
   const [command, setCommand] = useState("");
 
   useEffect(() => {
-    console.log({ isFocused });
     if (!isFocused) {
       textRef.current?.focus();
     }
@@ -31,8 +32,7 @@ const Input: FC<InputProps> = ({ onSubmit, isFocused }) => {
 
   return (
     <form onSubmit={(e) => e.preventDefault()} className="flex items-center">
-      <span className="pr-2">{">"}</span>
-      <div>
+      <>
         <textarea
           className="input-terminal"
           onKeyDown={handleKeyDown}
@@ -41,11 +41,11 @@ const Input: FC<InputProps> = ({ onSubmit, isFocused }) => {
           placeholder="Type a command..."
         />
         <div className="liner">
-          <span className="text-custom-green">sanjay@retro.ai:~$ </span>
+          <CommandPrompt />
           <span>{command}</span>
           {isFocused && <b className="animate-blink opacity-0">█</b>}
         </div>
-      </div>
+      </>
     </form>
   );
 };

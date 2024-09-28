@@ -1,3 +1,5 @@
+import { History } from "./terminal";
+
 export type PlayerState = {
   location: string;
   inventory: string[];
@@ -11,6 +13,7 @@ export type PlayerContextType = {
   updatePlayerState: (newState: PlayerState[]) => void;
   makeDecision: (decision: PlayerDecision) => void;
   addItemToInventory: (item: string) => void;
+  playerActions: PlayerActions;
 };
 
 export type PlayerDecision = {
@@ -38,12 +41,13 @@ export const PlayerDecisions: Record<string, PlayerDecision> = {
 };
 
 export interface PlayerActions {
-  look: (item: string) => void;
-  inventory: () => void;
-  go: (direction: string) => void;
-  pickup: (item: string) => void;
-  drop: (item: string) => void;
-  use: (item: string) => void;
-  clear: () => void;
-  help: () => void;
+  // [key: string]: (arg: string[]) => History;
+  look: (item: string[]) => History;
+  go: (direction: string[]) => History;
+  pickup: (item: string[]) => History;
+  drop: (item: string[]) => History;
+  use: (item: string[]) => History;
+  clear: () => History;
+  help: () => History;
+  inventory: () => History;
 }

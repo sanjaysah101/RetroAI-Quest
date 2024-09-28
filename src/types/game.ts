@@ -1,13 +1,16 @@
+export type GameLogType = {
+  message: string;
+  type: "error" | "info" | "initial";
+  command: string;
+};
+
 export type GameContextType = {
   gameState: GameState;
-  log: {
-    message: string;
-    type: "error" | "info";
-  }[];
-  addToLog: (message: string) => void;
+  log: GameLogType[];
+  addToLog: (message: string, type: "error" | "info", command: string) => void;
   changeScene: (newScene: GameScene) => void;
   clearLog: () => void;
-  handleTerminalInput: (input: string) => void;
+  // handleTerminalInput: (input: string) => void;
 };
 
 export type GameState = {

@@ -1,17 +1,17 @@
-import { useGame } from "../hooks/useGame";
+// import { useGame } from "../hooks/useGame";
+import { useTerminal } from "../hooks/useTerminal";
+import CommandPrompt from "./ComandPrompt";
 import TypingEffect from "./TypingEffect";
 
 const GameLog = () => {
-  const { log } = useGame();
+  // const { log } = useGame();
+  const { history } = useTerminal();
 
-  return log.map(({ message, type }, index) => (
+  return history.map(({ output, type }, index) => (
     <div key={index}>
-      <div>
-        <span className="pr-2">{">"}</span>
-        <span className="text-custom-green">sanjay@retro.ai:~$ </span>
-      </div>
+      {type !== "initial" && <CommandPrompt />}
       <div className={`whitespace-pre-wrap ${type === "error" ? "text-red-500" : ""}`}>
-        <TypingEffect text={message} />
+        <TypingEffect text={output} />
       </div>
     </div>
   ));

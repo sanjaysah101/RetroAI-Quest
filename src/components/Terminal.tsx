@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { useGame } from "../hooks/useGame";
+import { useTerminal } from "../hooks/useTerminal";
 import GameLog from "./GameLog";
 import Input from "./Terminal/Input";
 
@@ -31,7 +31,7 @@ const Terminal = () => {
   //   setLog((prevLog) => [...prevLog, response]);
   // };
 
-  const { handleTerminalInput } = useGame();
+  const { handleCommand } = useTerminal();
 
   return (
     <div
@@ -42,7 +42,7 @@ const Terminal = () => {
     >
       <div className="mb-4 mt-4 flex-grow overflow-y-auto"></div>
       <GameLog />
-      <Input onSubmit={handleTerminalInput} isFocused={isFocused} />
+      <Input onSubmit={handleCommand} isFocused={isFocused} />
     </div>
   );
 };

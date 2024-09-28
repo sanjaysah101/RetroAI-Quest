@@ -1,6 +1,7 @@
 import React, { FC, createContext, useState } from "react";
 
 import { PlayerActions, PlayerContextType, PlayerDecision, PlayerState } from "../types/player";
+import { History, TerminalOutputType } from "../types/terminal";
 
 export const PlayerContext = createContext<PlayerContextType | null>(null);
 
@@ -35,39 +36,79 @@ export const PlayerProvider: FC<{ children: React.ReactNode }> = ({ children }) 
     }));
   };
 
-  const look = (item: string) => {
+  const look = (item: string[]): History => {
     console.log(item);
+    return {
+      command: "look",
+      output: "You look at the item",
+      type: TerminalOutputType.INFO,
+    };
   };
 
-  const inventory = () => {
+  const inventory = (): History => {
     console.log(playerState.inventory);
+    return {
+      command: "inventory",
+      output: "You look at the item",
+      type: TerminalOutputType.INFO,
+    };
   };
 
-  const go = (direction: string) => {
+  const go = (direction: string[]): History => {
     console.log(direction);
+    return {
+      command: "go",
+      output: "You go to the direction",
+      type: TerminalOutputType.INFO,
+    };
   };
 
-  const pickup = (item: string) => {
+  const pickup = (item: string[]): History => {
     console.log(item);
+    return {
+      command: "pickup",
+      output: "You pickup the item",
+      type: TerminalOutputType.INFO,
+    };
   };
 
-  const drop = (item: string) => {
+  const drop = (item: string[]): History => {
     console.log(item);
+    return {
+      command: "drop",
+      output: "You drop the item",
+      type: TerminalOutputType.INFO,
+    };
   };
 
-  const use = (item: string) => {
+  const use = (item: string[]): History => {
     console.log(item);
+    return {
+      command: "use",
+      output: "You use the item",
+      type: TerminalOutputType.INFO,
+    };
   };
 
-  const clear = () => {
+  const clear = (): History => {
     console.log("cleared");
+    return {
+      command: "clear",
+      output: "You cleared the terminal",
+      type: TerminalOutputType.INFO,
+    };
   };
 
-  const help = () => {
+  const help = (): History => {
     console.log("help");
+    return {
+      command: "help",
+      output: "You get help",
+      type: TerminalOutputType.INFO,
+    };
   };
 
-  const playerActions = {
+  const playerActions: PlayerActions = {
     look,
     inventory,
     go,
