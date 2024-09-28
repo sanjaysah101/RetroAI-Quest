@@ -33,3 +33,18 @@ export const enemyArt = `
  |        |
  |________|
 `;
+
+export const treasureArt = `
+      _____
+     /     \\
+    /_______\\
+   (         )
+    \\_______/
+`;
+
+export const playerArt = `
+  ______
+ |      |
+ |  PLAYER 
+ |______|
+`;
