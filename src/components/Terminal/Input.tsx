@@ -1,6 +1,6 @@
 import { FC, useEffect, useRef, useState } from "react";
 
-import CommandPrompt from "../ComandPrompt";
+import CommandPrompt from "../CommandPrompt";
 
 interface InputProps {
   onSubmit: (command: string) => void;

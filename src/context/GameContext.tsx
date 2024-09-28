@@ -1,6 +1,5 @@
 import { FC, createContext, useState } from "react";
 
-// import { helpArt } from "../assets/asciiArt";
 import { GameContextType, GameLogType, GameScene, GameState } from "../types/game";
 
 // Create GameContext

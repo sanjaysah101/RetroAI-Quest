@@ -4,7 +4,7 @@ export default {
   theme: {
     extend: {
       animation: {
-        typewriter: "typewriter 2s steps(11) forwards",
+        typewriter: "typewriter 1s steps(11) forwards",
         blink: "blink 1s step-start infinite",
       },
       keyframes: {

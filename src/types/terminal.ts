@@ -24,11 +24,33 @@ export interface History {
 export interface TerminalContextType {
   command: string;
   history: History[];
-  setHistory: (fn: (prev: History[]) => History[]) => void;
   username: string;
   hostname: string;
-  setCommand: (command: string) => void;
-  setUsername: (user: string) => void;
-  setHostname: (hostname: string) => void;
   handleCommand: (command: string) => void;
 }
+
+export enum TerminalActions {
+  SET_USERNAME = "set username",
+  SET_HOSTNAME = "set hostname",
+  CLEAR = "clear",
+  HELP = "help",
+}
+
+export const TerminalCommandHelp = {
+  SET_USERNAME: {
+    command: "set username &lt;username&gt;",
+    description: "Set the username",
+  },
+  SET_HOSTNAME: {
+    command: "set hostname &lt;hostname&gt;",
+    description: "Set the hostname",
+  },
+  CLEAR: {
+    command: "clear",
+    description: "Clear the terminal",
+  },
+  HELP: {
+    command: "help",
+    description: "Show the help menu",
+  },
+};

@@ -1,8 +1,8 @@
 import { useState } from "react";
 
-import { useTerminal } from "../hooks/useTerminal";
-import GameLog from "./GameLog";
-import Input from "./Terminal/Input";
+import { useTerminal } from "../../hooks/useTerminal";
+import Input from "./Input";
+import GameLog from "./TerminalHistory";
 
 const Terminal = () => {
   const [isFocused, setIsFocused] = useState(false);

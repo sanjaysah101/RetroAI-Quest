@@ -40,8 +40,18 @@ export const PlayerDecisions: Record<string, PlayerDecision> = {
   },
 };
 
+export const PlayerCommands = {
+  LOOK: "look",
+  GO: "go",
+  PICKUP: "pickup",
+  DROP: "drop",
+  USE: "use",
+  CLEAR: "clear",
+  HELP: "user --help",
+  INVENTORY: "inventory",
+};
+
 export interface PlayerActions {
-  // [key: string]: (arg: string[]) => History;
   look: (item: string[]) => History;
   go: (direction: string[]) => History;
   pickup: (item: string[]) => History;
@@ -51,3 +61,38 @@ export interface PlayerActions {
   help: () => History;
   inventory: () => History;
 }
+
+export const PlayerHelpCommands: Record<keyof typeof PlayerCommands, { command: string; description: string }> = {
+  LOOK: {
+    command: "look",
+    description: "Look at the item",
+  },
+  INVENTORY: {
+    command: "inventory",
+    description: "Show the inventory",
+  },
+  GO: {
+    command: "go",
+    description: "Go to the direction",
+  },
+  PICKUP: {
+    command: "pickup",
+    description: "Pickup the item",
+  },
+  DROP: {
+    command: "drop",
+    description: "Drop the item",
+  },
+  USE: {
+    command: "use",
+    description: "Use the item",
+  },
+  CLEAR: {
+    command: "clear",
+    description: "Clear the terminal",
+  },
+  HELP: {
+    command: "help",
+    description: "Show the help",
+  },
+};
