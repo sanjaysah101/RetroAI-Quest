@@ -2,8 +2,10 @@ import Terminal from "./components/Terminal/Terminal";
 import { GameProvider } from "./context/GameContext";
 import { PlayerProvider } from "./context/PlayerContext";
 import { TerminalProvider } from "./context/TerminalContext";
+import { useGame } from "./hooks/useGame";
 import { usePlayer } from "./hooks/usePlayer";
-import { IntroScene } from "./types/game";
+import { GameHelpCommands } from "./types/game";
+import { PlayerHelpCommands } from "./types/player";
 import { CommandActions } from "./types/terminal";
 
 function App() {
@@ -22,13 +24,18 @@ function App() {
 
 const GameTerminal = () => {
   const { playerActions } = usePlayer();
+  const { gameState, gameActions } = useGame();
 
   return (
     <TerminalProvider
-      commandActions={playerActions as unknown as CommandActions<string>}
+      commandActions={{
+        ...(playerActions as unknown as CommandActions<string>),
+        ...(gameActions as unknown as CommandActions<string>),
+      }}
       username="sanjay"
       hostname="retro.ai"
-      history={IntroScene}
+      history={gameState.gameHistory}
+      helpCommand={[...Object.values(PlayerHelpCommands), ...Object.values(GameHelpCommands)]}
     >
       <Terminal />
     </TerminalProvider>

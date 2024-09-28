@@ -1,11 +1,11 @@
-import { History } from "./terminal";
+import { History, TerminalCommandHelp } from "./terminal";
 
 export type PlayerState = {
   location: string;
   inventory: string[];
   decisions: PlayerDecision[];
   hasSword: boolean;
-  playerActions: PlayerActions;
+  playerActions: PlayerActionsOnCommand;
 };
 
 export type PlayerContextType = {
@@ -13,7 +13,7 @@ export type PlayerContextType = {
   updatePlayerState: (newState: PlayerState[]) => void;
   makeDecision: (decision: PlayerDecision) => void;
   addItemToInventory: (item: string) => void;
-  playerActions: PlayerActions;
+  playerActions: PlayerActionsOnCommand;
 };
 
 export type PlayerDecision = {
@@ -40,59 +40,59 @@ export const PlayerDecisions: Record<string, PlayerDecision> = {
   },
 };
 
-export const PlayerCommands = {
-  LOOK: "look",
-  GO: "go",
-  PICKUP: "pickup",
-  DROP: "drop",
-  USE: "use",
-  CLEAR: "clear",
-  HELP: "user --help",
-  INVENTORY: "inventory",
-};
+export enum PlayerCommands {
+  LOOK = "look",
+  GO = "go",
+  PICKUP = "pickup",
+  DROP = "drop",
+  USE = "use",
+  CLEAR = "clear",
+  HELP = "user --help",
+  INVENTORY = "inventory",
+}
 
-export interface PlayerActions {
+export interface PlayerActionsOnCommand {
   look: (item: string[]) => History;
   go: (direction: string[]) => History;
   pickup: (item: string[]) => History;
   drop: (item: string[]) => History;
   use: (item: string[]) => History;
   clear: () => History;
-  help: () => History;
+  "user --help": () => History;
   inventory: () => History;
 }
 
-export const PlayerHelpCommands: Record<keyof typeof PlayerCommands, { command: string; description: string }> = {
-  LOOK: {
+export const PlayerHelpCommands: Record<PlayerCommands, TerminalCommandHelp> = {
+  [PlayerCommands.LOOK]: {
     command: "look",
     description: "Look at the item",
   },
-  INVENTORY: {
+  [PlayerCommands.INVENTORY]: {
     command: "inventory",
     description: "Show the inventory",
   },
-  GO: {
+  [PlayerCommands.GO]: {
     command: "go",
     description: "Go to the direction",
   },
-  PICKUP: {
+  [PlayerCommands.PICKUP]: {
     command: "pickup",
     description: "Pickup the item",
   },
-  DROP: {
+  [PlayerCommands.DROP]: {
     command: "drop",
     description: "Drop the item",
   },
-  USE: {
+  [PlayerCommands.USE]: {
     command: "use",
     description: "Use the item",
   },
-  CLEAR: {
+  [PlayerCommands.CLEAR]: {
     command: "clear",
     description: "Clear the terminal",
   },
-  HELP: {
-    command: "help",
-    description: "Show the help",
+  [PlayerCommands.HELP]: {
+    command: "user --help",
+    description: "Show the User Help",
   },
 };

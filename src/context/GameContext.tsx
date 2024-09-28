@@ -1,6 +1,7 @@
 import { FC, createContext, useState } from "react";
 
-import { GameContextType, GameLogType, GameScene, GameState } from "../types/game";
+import { GameCommands, GameContextType, GameScenes, GameState } from "../types/game";
+import { History, TerminalOutputType } from "../types/terminal";
 
 // Create GameContext
 export const GameContext = createContext<GameContextType | undefined>(undefined);
@@ -8,63 +9,77 @@ export const GameContext = createContext<GameContextType | undefined>(undefined)
 // GameProvider component
 export const GameProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
   const [gameState, setGameState] = useState<GameState>({
-    currentScene: GameScene.INTRO,
+    currentScene: GameCommands.INTRO,
+    gameHistory: GameScenes[GameCommands.INTRO],
   });
 
-  const [log, setLog] = useState<GameLogType[]>([
-    {
-      message: "<span class='text-white'>Welcome to the game</span><br/><br/>",
-      type: "initial",
-      command: "",
-    },
-  ]);
-
-  // Add a new entry to the game log
-  const addToLog = (message: string, type: "error" | "info" = "info", command: string) => {
-    setLog((prevState) => [...prevState, { message, type, command }]);
-  };
-
-  const clearLog = () => {
-    setLog([]);
-  };
-
   // Function to change scenes
-  const changeScene = (newScene: GameScene) => {
+  const changeScene = (newScene: GameCommands) => {
     setGameState((prevState) => ({
       ...prevState,
       currentScene: newScene,
     }));
   };
 
-  // const handleTerminalInput = (input: string) => {
-  //   if (Object.values(TerminalActions).includes(input as TerminalActions)) {
-  //     if (input.toLowerCase() === TerminalActions.HELP) {
-  //       setHistory((prev) => [
-  //         ...prev,
-  //         { command: input, output: `${helpArt}\nAvailable commands: ${Object.values(TerminalActions).join(", ")}` },
-  //       ]);
-  //       addToLog(`${helpArt}\nAvailable commands: ${Object.values(TerminalActions).join(", ")}`, "info", input);
-  //     } else if (input.toLowerCase() === TerminalActions.CLEAR) {
-  //       clearLog();
-  //     } else if (input.toLowerCase() === TerminalActions.NEW) {
-  //       addToLog("New game started", "info", input);
-  //     }
-  //   } else {
-  //     addToLog(
-  //       `<span class="text-red-500">Unknown command: ${input}. For a list of commands, type <span class="text-blue-300">"help"</span></span>`,
-  //       "error",
-  //       input
-  //     );
-  //   }
-  // };
+  const startGame = (): History => {
+    setGameState((prevState) => ({
+      ...prevState,
+      currentScene: GameCommands.GAME,
+    }));
+    return {
+      command: "game --start",
+      output: "You start the game",
+      type: TerminalOutputType.INFO,
+    };
+  };
+
+  const endGame = () => {
+    setGameState((prevState) => ({
+      ...prevState,
+      currentScene: GameCommands.END,
+    }));
+    return {
+      command: "game --end",
+      output: "You end the game",
+      type: TerminalOutputType.INFO,
+    };
+  };
+
+  const help = (): History => {
+    console.log("help");
+    return {
+      command: "game --help",
+      output: "You get help",
+      type: TerminalOutputType.INFO,
+    };
+  };
+
+  const intro = (): History => {
+    return {
+      command: "intro",
+      output: "You see the intro",
+      type: TerminalOutputType.INFO,
+    };
+  };
+
+  const game = (): History => {
+    return {
+      command: "game",
+      output: "You see the game",
+      type: TerminalOutputType.INFO,
+    };
+  };
 
   const value = {
     gameState,
-    log,
-    addToLog,
     changeScene,
-    clearLog,
-    // handleTerminalInput,
+    gameActions: {
+      [GameCommands.HELP]: help,
+      [GameCommands.START]: startGame,
+      [GameCommands.END]: endGame,
+      [GameCommands.INTRO]: intro,
+      [GameCommands.GAME]: game,
+    },
   };
 
   return <GameContext.Provider value={value}>{children}</GameContext.Provider>;

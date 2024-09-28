@@ -4,7 +4,7 @@ import { helpArt } from "../assets/asciiArt";
 import {
   CommandActions,
   History,
-  TerminalActions,
+  TerminalCommand,
   TerminalCommandHelp,
   TerminalContextType,
   TerminalOutputType,
@@ -18,13 +18,22 @@ export const TerminalProvider = <T extends string>(props: {
   username: string;
   hostname: string;
   command?: string;
+  helpCommand?: TerminalCommandHelp[];
   history?: History[];
 }) => {
-  const { children, commandActions } = props;
-  const [username, setUsername] = useState<string>(props.username);
-  const [hostname, setHostname] = useState<string>(props.hostname);
-  const [command, setCommand] = useState<string>(props.command || "");
-  const [history, setHistory] = useState<History[]>(props.history || []);
+  const {
+    children,
+    commandActions,
+    username: initialUsername,
+    hostname: initialHostname,
+    command: initialCommand,
+    history: initialHistory,
+    helpCommand,
+  } = props;
+  const [username, setUsername] = useState<string>(initialUsername);
+  const [hostname, setHostname] = useState<string>(initialHostname);
+  const [command, setCommand] = useState<string>(initialCommand || "");
+  const [history, setHistory] = useState<History[]>(initialHistory || []);
 
   const handleCommand = (newCommand: string) => {
     let historyEntry: History = {
@@ -33,12 +42,12 @@ export const TerminalProvider = <T extends string>(props: {
       type: TerminalOutputType.INFO,
     };
 
-    if (newCommand === TerminalActions.CLEAR) {
+    if (newCommand === TerminalCommand.CLEAR) {
       setHistory([]);
       return;
     }
 
-    if (newCommand.startsWith(TerminalActions.SET_USERNAME)) {
+    if (newCommand.startsWith(TerminalCommand.SET_USERNAME)) {
       const username = newCommand.split(" ")[2];
 
       if (!username) {
@@ -65,7 +74,7 @@ export const TerminalProvider = <T extends string>(props: {
       return;
     }
 
-    if (newCommand.startsWith(TerminalActions.SET_HOSTNAME)) {
+    if (newCommand.startsWith(TerminalCommand.SET_HOSTNAME)) {
       const hostname = newCommand.split(" ")[2];
 
       if (!hostname) {
@@ -92,16 +101,24 @@ export const TerminalProvider = <T extends string>(props: {
       return;
     }
 
-    if (newCommand === TerminalActions.HELP) {
+    if (newCommand === TerminalCommand.HELP) {
+      const formatCommands = (commands: TerminalCommandHelp[]) =>
+        commands
+          .map(
+            ({ command, description }) =>
+              `<span class="text-blue-300">${command}</span> - <span class="text-[#B89076]">${description}</span>`
+          )
+          .join("\n\n");
+
       const historyEntry = {
         command: newCommand,
         output:
           helpArt +
           "\n\n" +
           "\nAvailable commands\n\n" +
-          Object.values(TerminalCommandHelp)
-            .map(({ command, description }) => `<span class="text-blue-300">${command}</span> - <span class="text-[#B89076]">${description}</span>`)
-            .join("\n"),
+          formatCommands(Object.values(TerminalCommandHelp)) +
+          "\n\n" +
+          (helpCommand ? formatCommands(helpCommand) : ""),
         type: TerminalOutputType.INFO,
       };
       setHistory((prev) => [...prev, historyEntry]);

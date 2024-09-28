@@ -29,14 +29,19 @@ export interface TerminalContextType {
   handleCommand: (command: string) => void;
 }
 
-export enum TerminalActions {
+export enum TerminalCommand {
   SET_USERNAME = "set username",
   SET_HOSTNAME = "set hostname",
   CLEAR = "clear",
   HELP = "help",
 }
 
-export const TerminalCommandHelp = {
+export type TerminalCommandHelp = {
+  command: string;
+  description: string;
+};
+
+export const TerminalCommandHelp: Record<keyof typeof TerminalCommand, TerminalCommandHelp> = {
   SET_USERNAME: {
     command: "set username &lt;username&gt;",
     description: "Set the username",

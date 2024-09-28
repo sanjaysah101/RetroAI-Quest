@@ -1,64 +1,96 @@
 import { retroAIArt } from "../assets/asciiArt";
-import { History, TerminalOutputType } from "./terminal";
-
-export type GameLogType = {
-  message: string;
-  type: "error" | "info" | "initial";
-  command: string;
-};
+import { History, TerminalCommandHelp, TerminalOutputType } from "./terminal";
 
 export type GameContextType = {
   gameState: GameState;
-  log: GameLogType[];
-  addToLog: (message: string, type: "error" | "info", command: string) => void;
-  changeScene: (newScene: GameScene) => void;
-  clearLog: () => void;
-  // handleTerminalInput: (input: string) => void;
+  changeScene: (newScene: GameCommands) => void;
+  gameActions: GameActionsOnCommand;
 };
+
+export interface GameActionsOnCommand {
+  "game --start": () => History;
+  "game --end": () => History;
+  "game --help": () => History;
+  intro: () => History;
+  game: () => History;
+}
 
 export type GameState = {
-  currentScene: GameScene;
+  currentScene: GameCommands;
+  gameHistory: History[];
 };
 
-export enum GameScene {
+export enum GameCommands {
   INTRO = "intro",
   GAME = "game",
-  END = "end",
+  START = "game --start",
+  END = "game --end",
+  HELP = "game --help",
 }
 
-export enum TerminalActions {
-  HELP = "help",
-  CLEAR = "clear",
-  NEW = "new",
-}
-
-export const GameSceneMap: Record<GameScene, { description: string; commands: string[] }> = {
-  [GameScene.INTRO]: {
-    description: "Welcome to the game",
-    commands: [TerminalActions.NEW, TerminalActions.HELP, TerminalActions.CLEAR],
+export const GameHelpCommands: Record<GameCommands, TerminalCommandHelp> = {
+  [GameCommands.INTRO]: {
+    command: "intro",
+    description: "Show the intro scene",
   },
-  [GameScene.GAME]: {
-    description: "Game scene",
-    commands: [TerminalActions.NEW, TerminalActions.HELP, TerminalActions.CLEAR],
+  [GameCommands.GAME]: {
+    command: "game",
+    description: "Show the game scene",
   },
-  [GameScene.END]: {
-    description: "End scene",
-    commands: [TerminalActions.NEW, TerminalActions.HELP, TerminalActions.CLEAR],
+  [GameCommands.START]: {
+    command: "game --start",
+    description: "Start the game",
+  },
+  [GameCommands.END]: {
+    command: "game --end",
+    description: "End the game",
+  },
+  [GameCommands.HELP]: {
+    command: "game --help",
+    description: "Show the game help menu",
   },
 };
 
-export const IntroScene: History[] = [
-  {
-    command: "IntroScene",
-    output: [
-      "Welcome to the game<span>${retroAIArt}<span><br/>",
-      "<span class='text-[#B89076]'>Hostname set to </span>" + "<span class='text-blue-300'>retro.ai</span>",
-      "<span class='text-[#B89076]'>Username set to </span>" + "<span class='text-blue-300'>sanjay</span>",
-      "<span class='text-[#B89076]'>New game started </span>",
-      `<span class="text-[#B89076]">For a list of available commands, type </span> - <span class="text-blue-300">help</span>`,
-    ].join("\n\n"),
-    type: TerminalOutputType.INITIAL,
-  },
-];
-
-// "<span class='text-blue-300'>help</span>.",
+export const GameScenes: Record<GameCommands, History[]> = {
+  [GameCommands.INTRO]: [
+    {
+      command: "IntroScene",
+      output: [
+        `Welcome to the game`,
+        retroAIArt,
+        "<span class='text-[#B89076]'>Hostname set to </span>" + "<span class='text-blue-300'>retro.ai</span>",
+        "<span class='text-[#B89076]'>Username seat to </span>" + "<span class='text-blue-300'>sanjay</span>",
+        `<span class="text-[#B89076]">For a list of available commands, type </span> - <span class="text-blue-300">help</span>`,
+      ].join("\n\n"),
+      type: TerminalOutputType.INITIAL,
+    },
+  ],
+  [GameCommands.GAME]: [
+    {
+      command: GameCommands.GAME,
+      output: ["You are in the game"].join("\n\n"),
+      type: TerminalOutputType.INITIAL,
+    },
+  ],
+  [GameCommands.START]: [
+    {
+      command: GameCommands.START,
+      output: ["You have started the game"].join("\n\n"),
+      type: TerminalOutputType.INITIAL,
+    },
+  ],
+  [GameCommands.END]: [
+    {
+      command: GameCommands.END,
+      output: ["You have reached the end of the game"].join("\n\n"),
+      type: TerminalOutputType.INITIAL,
+    },
+  ],
+  [GameCommands.HELP]: [
+    {
+      command: GameCommands.HELP,
+      output: ["You have reached the end of the game"].join("\n\n"),
+      type: TerminalOutputType.INITIAL,
+    },
+  ],
+};

@@ -1,6 +1,12 @@
 import React, { FC, createContext, useState } from "react";
 
-import { PlayerActions, PlayerContextType, PlayerDecision, PlayerState } from "../types/player";
+import {
+  PlayerActionsOnCommand,
+  PlayerCommands,
+  PlayerContextType,
+  PlayerDecision,
+  PlayerState,
+} from "../types/player";
 import { History, TerminalOutputType } from "../types/terminal";
 
 export const PlayerContext = createContext<PlayerContextType | null>(null);
@@ -11,7 +17,7 @@ export const PlayerProvider: FC<{ children: React.ReactNode }> = ({ children }) 
     location: "starting point",
     inventory: [] as string[],
     decisions: [] as PlayerDecision[],
-    playerActions: {} as PlayerActions,
+    playerActions: {} as PlayerActionsOnCommand,
     hasSword: false,
   });
 
@@ -108,15 +114,15 @@ export const PlayerProvider: FC<{ children: React.ReactNode }> = ({ children }) 
     };
   };
 
-  const playerActions: PlayerActions = {
-    look,
-    inventory,
-    go,
-    pickup,
-    drop,
-    use,
-    clear,
-    help,
+  const playerActions: PlayerActionsOnCommand = {
+    [PlayerCommands.LOOK]: look,
+    [PlayerCommands.INVENTORY]: inventory,
+    [PlayerCommands.GO]: go,
+    [PlayerCommands.PICKUP]: pickup,
+    [PlayerCommands.DROP]: drop,
+    [PlayerCommands.USE]: use,
+    [PlayerCommands.CLEAR]: clear,
+    [PlayerCommands.HELP]: help,
   };
 
   const value = {
