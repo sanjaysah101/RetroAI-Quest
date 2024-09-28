@@ -1,24 +1,27 @@
-import { FC, useEffect, useRef, useState } from 'react';
+import { FC, useEffect, useRef, useState } from "react";
 
 interface InputProps {
   onSubmit: (command: string) => void;
+  isFocused: boolean;
 }
 
-const Input: FC<InputProps> = ({ onSubmit }) => {
+const Input: FC<InputProps> = ({ onSubmit, isFocused }) => {
   const textRef = useRef<HTMLTextAreaElement>(null);
-  const [command, setCommand] = useState('');
-  const [isFocused, setIsFocused] = useState(false);
+  const [command, setCommand] = useState("");
 
   useEffect(() => {
-    textRef.current?.focus();
-  }, []);
+    console.log({ isFocused });
+    if (!isFocused) {
+      textRef.current?.focus();
+    }
+  }, [isFocused]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       e.preventDefault(); // Prevent new line
       onSubmit(command); // Submit the command as a string
-      setCommand('');
-    } else if (e.key === 'Backspace') {
+      setCommand("");
+    } else if (e.key === "Backspace") {
       e.preventDefault(); // Prevent default backspace behavior
       setCommand((prev) => prev.slice(0, -1)); // Remove last character
     } else if (e.key.length === 1) {
@@ -28,17 +31,13 @@ const Input: FC<InputProps> = ({ onSubmit }) => {
 
   return (
     <form onSubmit={(e) => e.preventDefault()} className="flex items-center">
-      <span className="pr-2">{'>'}</span>
-      <div
-        onClick={() => textRef.current?.focus()}
-        onFocus={() => setIsFocused(true)}
-        onBlur={() => setIsFocused(false)}
-      >
+      <span className="pr-2">{">"}</span>
+      <div>
         <textarea
           className="input-terminal"
           onKeyDown={handleKeyDown}
           ref={textRef}
-          autoFocus
+          autoFocus={isFocused}
           placeholder="Type a command..."
         />
         <div className="liner">

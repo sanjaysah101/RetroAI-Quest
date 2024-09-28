@@ -1,11 +1,13 @@
-// import { useState } from 'react';
-// import { enemyArt, helpArt, swordArt } from '../assets/asciiArt';
-import { useGame } from '../hooks/useGame';
-import { usePlayer } from '../hooks/usePlayer';
-import Input from './Terminal/Input';
+import { useState } from "react";
+
+import { useGame } from "../hooks/useGame";
+import GameLog from "./GameLog";
+import Input from "./Terminal/Input";
 
 const Terminal = () => {
-  // const [log, setLog] = useState<string[]>([]); // Log for storing output
+  const [isFocused, setIsFocused] = useState(false);
+
+  // const [log, setLog] = useState<string[]>([]); // Log for storing output.
 
   // const handleCommand = (command: string) => {
   //   if (command.trim() === '') return;
@@ -29,25 +31,18 @@ const Terminal = () => {
   //   setLog((prevLog) => [...prevLog, response]);
   // };
 
-  const { gameState } = useGame();
-  const { handleAction } = usePlayer();
+  const { handleTerminalInput } = useGame();
 
   return (
-    <div className="h-screen w-full bg-black text-green-500 font-mono">
-      <div className="flex-grow overflow-y-auto mb-4 mt-4">
-        {gameState.log.map((entry, index) => (
-          <pre
-            key={index}
-            className={`whitespace-pre-wrap ${
-              entry.includes('error') ? 'text-red-500' : ''
-            }`}
-          >
-            {entry}
-          </pre>
-        ))}
-      </div>
-
-      <Input onSubmit={handleAction} />
+    <div
+      className="w-full bg-black font-mono text-green-500"
+      onClick={() => setIsFocused(true)}
+      onFocus={() => setIsFocused(true)}
+      onBlur={() => setIsFocused(false)}
+    >
+      <div className="mb-4 mt-4 flex-grow overflow-y-auto"></div>
+      <GameLog />
+      <Input onSubmit={handleTerminalInput} isFocused={isFocused} />
     </div>
   );
 };

@@ -1,24 +1,16 @@
-import React, { createContext, FC, useState } from 'react';
-import {
-  PlayerContextType,
-  PlayerDecision,
-  PlayerState,
-} from '../types/player';
-import { BasicActions } from '../types/game';
-import { useGame } from '../hooks/useGame';
+import React, { FC, createContext, useState } from "react";
+
+import { PlayerActions, PlayerContextType, PlayerDecision, PlayerState } from "../types/player";
 
 export const PlayerContext = createContext<PlayerContextType | null>(null);
 
 // Provide the context to wrap your components
-export const PlayerProvider: FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
-  const { addToLog } = useGame();
-
+export const PlayerProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
   const [playerState, setPlayerState] = useState<PlayerState>({
-    location: 'starting point',
+    location: "starting point",
     inventory: [] as string[],
     decisions: [] as PlayerDecision[],
+    playerActions: {} as PlayerActions,
     hasSword: false,
   });
 
@@ -43,23 +35,47 @@ export const PlayerProvider: FC<{ children: React.ReactNode }> = ({
     }));
   };
 
-  const actionLogMap: { [key in BasicActions]: string } = {
-    [BasicActions.LOOK]: BasicActions.LOOK,
-    [BasicActions.INVENTORY]: BasicActions.INVENTORY,
-    [BasicActions.GO]: BasicActions.GO,
-    [BasicActions.PICKUP]: BasicActions.PICKUP,
-    [BasicActions.DROP]: BasicActions.DROP,
-    [BasicActions.USE]: BasicActions.USE,
-    [BasicActions.HELP]: `Available actions: ${Object.values(BasicActions).join(
-      ', '
-    )}`,
+  const look = (item: string) => {
+    console.log(item);
   };
 
-  const handleAction = (action: string | BasicActions) => {
-    const logMessage =
-      actionLogMap[action as BasicActions] ||
-      `Unknown command: ${action}. For a list of commands, type "help":`;
-    addToLog(logMessage);
+  const inventory = () => {
+    console.log(playerState.inventory);
+  };
+
+  const go = (direction: string) => {
+    console.log(direction);
+  };
+
+  const pickup = (item: string) => {
+    console.log(item);
+  };
+
+  const drop = (item: string) => {
+    console.log(item);
+  };
+
+  const use = (item: string) => {
+    console.log(item);
+  };
+
+  const clear = () => {
+    console.log("cleared");
+  };
+
+  const help = () => {
+    console.log("help");
+  };
+
+  const playerActions = {
+    look,
+    inventory,
+    go,
+    pickup,
+    drop,
+    use,
+    clear,
+    help,
   };
 
   const value = {
@@ -67,10 +83,8 @@ export const PlayerProvider: FC<{ children: React.ReactNode }> = ({
     updatePlayerState,
     makeDecision,
     addItemToInventory,
-    handleAction,
+    playerActions,
   };
 
-  return (
-    <PlayerContext.Provider value={value}>{children}</PlayerContext.Provider>
-  );
+  return <PlayerContext.Provider value={value}>{children}</PlayerContext.Provider>;
 };

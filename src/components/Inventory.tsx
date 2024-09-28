@@ -1,4 +1,4 @@
-import { usePlayer } from '../hooks/usePlayer';
+import { usePlayer } from "../hooks/usePlayer";
 
 export const Inventory = () => {
   const { playerState, addItemToInventory } = usePlayer();
@@ -11,7 +11,7 @@ export const Inventory = () => {
           <li key={index}>{item}</li>
         ))}
       </ul>
-      <button onClick={() => addItemToInventory('sword')}>Pick up Sword</button>
+      <button onClick={() => addItemToInventory("sword")}>Pick up Sword</button>
     </div>
   );
 };

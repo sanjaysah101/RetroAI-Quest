@@ -1,12 +1,17 @@
 export type GameContextType = {
   gameState: GameState;
+  log: {
+    message: string;
+    type: "error" | "info";
+  }[];
   addToLog: (message: string) => void;
   changeScene: (newScene: GameScene) => void;
+  clearLog: () => void;
+  handleTerminalInput: (input: string) => void;
 };
 
 export type GameState = {
   currentScene: string;
-  log: string[];
 };
 
 export type GameAction = {
@@ -14,20 +19,28 @@ export type GameAction = {
   payload: string | GameScene;
 };
 
-export type GameActionType = 'ADD_TO_LOG' | 'CHANGE_SCENE';
+export type GameActionType = "ADD_TO_LOG" | "CHANGE_SCENE";
 
 export enum GameScene {
-  INTRO = 'intro',
-  GAME = 'game',
-  END = 'end',
+  INTRO = "intro",
+  GAME = "game",
+  END = "end",
 }
 
-export enum BasicActions {
-  LOOK = 'look',
-  INVENTORY = 'inventory',
-  GO = 'go',
-  PICKUP = 'pickup',
-  DROP = 'drop',
-  USE = 'use',
-  HELP = 'help',
+export enum TerminalActions {
+  HELP = "help",
+  CLEAR = "clear",
+  NEW = "new",
+}
+
+export enum GameActions {
+  LOOK = "look",
+  INVENTORY = "inventory",
+  GO = "go",
+  PICKUP = "pickup",
+  DROP = "drop",
+  USE = "use",
+  HELP = "help",
+  CLEAR = "clear",
+  PLAY = "play",
 }

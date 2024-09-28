@@ -1,9 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: [
-    "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}",
-  ],
+  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
       animation: {
@@ -13,8 +10,8 @@ export default {
       keyframes: {
         typewriter: {
           to: {
-            left: "100%"
-          }
+            left: "100%",
+          },
         },
         blink: {
           "0%, 100%": { opacity: 1 },
@@ -24,4 +21,4 @@ export default {
     },
   },
   plugins: [],
-}
+};
