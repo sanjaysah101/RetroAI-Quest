@@ -5,8 +5,8 @@ export const PlayerStatus = () => {
 
   return (
     <div>
-      <h2>Player Location: {playerState.location}</h2>
-      <h3>Inventory: {playerState.inventory.join(", ") || "Empty"}</h3>
+      <h2>Player Location: {playerState?.location}</h2>
+      <h3>Inventory: {playerState?.inventory?.join(", ") || "Empty"}</h3>
     </div>
   );
 };

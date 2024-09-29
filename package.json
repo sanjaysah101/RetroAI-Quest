@@ -1,8 +1,9 @@
 {
-  "name": "retroai-quest-hackathon",
+  "name": "retroai-quest",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
+  "homepage": "https://github.com/sanjaysah101/RetroAI-Quest",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
