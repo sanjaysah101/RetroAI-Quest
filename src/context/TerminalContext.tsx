@@ -9,6 +9,7 @@ import {
   TerminalContextType,
   TerminalOutputType,
 } from "../types/terminal";
+import { formatHelpCommands } from "../utils";
 
 export const TerminalContext = createContext<TerminalContextType | undefined>(undefined);
 
@@ -102,23 +103,15 @@ export const TerminalProvider = <T extends string>(props: {
     }
 
     if (newCommand === TerminalCommand.HELP) {
-      const formatCommands = (commands: TerminalCommandHelp[]) =>
-        commands
-          .map(
-            ({ command, description }) =>
-              `<span class="text-blue-300">${command}</span> - <span class="text-[#B89076]">${description}</span>`
-          )
-          .join("\n\n");
-
       const historyEntry = {
         command: newCommand,
         output:
           helpArt +
           "\n\n" +
           "\nAvailable commands\n\n" +
-          formatCommands(Object.values(TerminalCommandHelp)) +
+          formatHelpCommands(Object.values(TerminalCommandHelp)) +
           "\n\n" +
-          (helpCommand ? formatCommands(helpCommand) : ""),
+          (helpCommand ? formatHelpCommands(helpCommand) : ""),
         type: TerminalOutputType.INFO,
       };
       setHistory((prev) => [...prev, historyEntry]);

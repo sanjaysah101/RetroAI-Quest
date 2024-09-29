@@ -6,6 +6,7 @@ export type PlayerState = {
   decisions?: PlayerDecision[];
   hasSword?: boolean;
   playerActions?: PlayerActionsOnCommand;
+  goal?: string;
 };
 
 export type PlayerContextType = {
@@ -51,13 +52,13 @@ export enum PlayerCommands {
 }
 
 export interface PlayerActionsOnCommand {
-  look: (item: string[]) => History;
-  go: (direction: string[]) => History;
-  pickup: (item: string[]) => History;
-  drop: (item: string[]) => History;
-  use: (item: string[]) => History;
-  "user --help": () => History;
-  inventory: () => History;
+  look: (item: string[]) => Promise<History>;
+  go: (direction: string[]) => Promise<History>;
+  pickup: (item: string[]) => Promise<History>;
+  drop: (item: string[]) => Promise<History>;
+  use: (item: string[]) => Promise<History>;
+  "user --help": () => Promise<History>;
+  inventory: () => Promise<History>;
 }
 
 export const PlayerHelpCommands: Record<PlayerCommands, TerminalCommandHelp> = {

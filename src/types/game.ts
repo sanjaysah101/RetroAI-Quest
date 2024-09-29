@@ -8,11 +8,12 @@ export type GameContextType = {
 };
 
 export interface GameActionsOnCommand {
-  "game --start": () => History;
-  "game --end": () => History;
-  "game --help": () => History;
+  "game --start": () => Promise<History>;
+  "game --end": () => Promise<History>;
+  "game --help": () => Promise<History>;
+  "game --credits": () => Promise<History>;
   intro: () => Promise<History>;
-  game: () => History;
+  game: () => Promise<History>;
 }
 
 export type GameState = {
@@ -26,6 +27,7 @@ export enum GameCommands {
   START = "game --start",
   END = "game --end",
   HELP = "game --help",
+  CREDITS = "game --credits",
 }
 
 export const GameHelpCommands: Record<GameCommands, TerminalCommandHelp> = {
@@ -48,6 +50,10 @@ export const GameHelpCommands: Record<GameCommands, TerminalCommandHelp> = {
   [GameCommands.HELP]: {
     command: "game --help",
     description: "Show the game help menu",
+  },
+  [GameCommands.CREDITS]: {
+    command: "game --credits",
+    description: "Show the game credits",
   },
 };
 
@@ -89,6 +95,13 @@ export const GameScenes: Record<GameCommands, History[]> = {
   [GameCommands.HELP]: [
     {
       command: GameCommands.HELP,
+      output: ["You have reached the end of the game"].join("\n\n"),
+      type: TerminalOutputType.INITIAL,
+    },
+  ],
+  [GameCommands.CREDITS]: [
+    {
+      command: GameCommands.CREDITS,
       output: ["You have reached the end of the game"].join("\n\n"),
       type: TerminalOutputType.INITIAL,
     },

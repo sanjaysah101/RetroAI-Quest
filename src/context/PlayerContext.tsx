@@ -1,6 +1,13 @@
 import React, { FC, createContext, useState } from "react";
 
 import {
+  generateAsciiArt,
+  generateGo,
+  generateNPCInteraction,
+  generateNewStoryline,
+  generateTreasureDiscovery,
+} from "../services/geminiAI";
+import {
   PlayerActionsOnCommand,
   PlayerCommands,
   PlayerContextType,
@@ -42,34 +49,40 @@ export const PlayerProvider: FC<{ children: React.ReactNode }> = ({ children }) 
     }));
   };
 
-  const look = (item: string[]): History => {
+  const look = async (): Promise<History> => {
+    const response = await generateNewStoryline(playerState);
+    const asciiArt = await generateAsciiArt("player location");
+
     return {
       command: "look",
-      output: `You look at the ${item}`,
+      output: response + "\n\n" + asciiArt,
       type: TerminalOutputType.INFO,
     };
   };
 
-  const go = (direction: string[]): History => {
-    console.log(direction)
+  const go = async (direction: string[]): Promise<History> => {
+    const response = await generateGo(playerState);
     return {
       command: `go ${direction}`,
-      output: `You go to the ${direction}`,
+      output: response,
       type: TerminalOutputType.INFO,
     };
   };
 
-  const inventory = (): History => {
+  const inventory = async (): Promise<History> => {
+    const response = await generateTreasureDiscovery(playerState, "sword");
+    const asciiArt = await generateAsciiArt("player inventory");
+
     return {
       command: "inventory",
-      output: `Current inventory: ${playerState.inventory?.join(", ") || "None"}`,
+      output: response + "\n\n" + asciiArt + `\nCurrent inventory: ${playerState.inventory?.join(", ") || "None"}`,
       type: TerminalOutputType.INFO,
     };
   };
-  const pickup = (item: string[]): History => {
-    if (item[0] === "sword") {
-      updatePlayerState([{ hasSword: true }]);
-    }
+
+  const pickup = async (item: string[]): Promise<History> => {
+    updatePlayerState([{ hasSword: true }]);
+
     return {
       command: "pickup",
       output: `You picked up ${item}`,
@@ -77,7 +90,7 @@ export const PlayerProvider: FC<{ children: React.ReactNode }> = ({ children }) 
     };
   };
 
-  const drop = (item: string[]): History => {
+  const drop = async (item: string[]): Promise<History> => {
     return {
       command: "drop",
       output: `You dropped ${item}`,
@@ -85,7 +98,7 @@ export const PlayerProvider: FC<{ children: React.ReactNode }> = ({ children }) 
     };
   };
 
-  const use = (item: string[]): History => {
+  const use = async (item: string[]): Promise<History> => {
     console.log(item);
     return {
       command: "use",
@@ -94,11 +107,11 @@ export const PlayerProvider: FC<{ children: React.ReactNode }> = ({ children }) 
     };
   };
 
-  const help = (): History => {
-    console.log("help");
+  const help = async (): Promise<History> => {
+    const response = await generateNPCInteraction("retro", "knight");
     return {
       command: "user --help",
-      output: "You get help",
+      output: response,
       type: TerminalOutputType.INFO,
     };
   };

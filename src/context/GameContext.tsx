@@ -1,8 +1,9 @@
 import { FC, createContext, useState } from "react";
 
-import { generateGameIntro } from "../services/geminiAI";
-import { GameCommands, GameContextType, GameScenes, GameState } from "../types/game";
+import { generateGameCredits, generateGameEnd, generateGameIntro, generateStartGame } from "../services/geminiAI";
+import { GameCommands, GameContextType, GameHelpCommands, GameScenes, GameState } from "../types/game";
 import { History, TerminalOutputType } from "../types/terminal";
+import { formatHelpCommands } from "../utils";
 
 // Create GameContext
 export const GameContext = createContext<GameContextType | undefined>(undefined);
@@ -22,35 +23,37 @@ export const GameProvider: FC<{ children: React.ReactNode }> = ({ children }) =>
     }));
   };
 
-  const startGame = (): History => {
+  const startGame = async (): Promise<History> => {
+    const story = await generateStartGame();
     setGameState((prevState) => ({
       ...prevState,
       currentScene: GameCommands.GAME,
     }));
     return {
       command: "game --start",
-      output: "You start the game",
+      output: story.split(".").join(".\n"),
       type: TerminalOutputType.INFO,
     };
   };
 
-  const endGame = () => {
+  const endGame = async (): Promise<History> => {
+    const story = await generateGameEnd();
+
     setGameState((prevState) => ({
       ...prevState,
       currentScene: GameCommands.END,
     }));
     return {
       command: "game --end",
-      output: "You end the game",
+      output: story.split(".").join(".\n"),
       type: TerminalOutputType.INFO,
     };
   };
 
-  const help = (): History => {
-    console.log("help");
+  const help = async (): Promise<History> => {
     return {
       command: "game --help",
-      output: "You get help",
+      output: formatHelpCommands(Object.values(GameHelpCommands)),
       type: TerminalOutputType.INFO,
     };
   };
@@ -64,10 +67,19 @@ export const GameProvider: FC<{ children: React.ReactNode }> = ({ children }) =>
     };
   };
 
-  const game = (): History => {
+  const game = async (): Promise<History> => {
     return {
       command: "game",
-      output: "You see the game",
+      output: "You enter the game. Please make a decision.",
+      type: TerminalOutputType.INFO,
+    };
+  };
+
+  const credits = async (): Promise<History> => {
+    const story = await generateGameCredits();
+    return {
+      command: "credits",
+      output: story.split(".").join(".\n"),
       type: TerminalOutputType.INFO,
     };
   };
@@ -81,6 +93,7 @@ export const GameProvider: FC<{ children: React.ReactNode }> = ({ children }) =>
       [GameCommands.END]: endGame,
       [GameCommands.INTRO]: intro,
       [GameCommands.GAME]: game,
+      [GameCommands.CREDITS]: credits,
     },
   };
 
