@@ -11,7 +11,7 @@ export interface GameActionsOnCommand {
   "game --start": () => History;
   "game --end": () => History;
   "game --help": () => History;
-  intro: () => History;
+  intro: () => Promise<History>;
   game: () => History;
 }
 

@@ -13,7 +13,7 @@ export const enum TerminalOutputType {
   INITIAL = "initial",
 }
 
-export type CommandActions<T> = { [key: string]: (arg: T[]) => History };
+export type CommandActions<T> = { [key: string]: (arg: T[]) => Promise<History> };
 
 export interface History {
   command: string;

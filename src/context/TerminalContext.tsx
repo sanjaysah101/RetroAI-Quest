@@ -35,7 +35,7 @@ export const TerminalProvider = <T extends string>(props: {
   const [command, setCommand] = useState<string>(initialCommand || "");
   const [history, setHistory] = useState<History[]>(initialHistory || []);
 
-  const handleCommand = (newCommand: string) => {
+  const handleCommand = async (newCommand: string) => {
     let historyEntry: History = {
       command: newCommand,
       output: `Command changed to: ${newCommand}`,
@@ -127,7 +127,7 @@ export const TerminalProvider = <T extends string>(props: {
 
     // Execute the action if it exists
     if (commandActions[newCommand]) {
-      historyEntry = commandActions[newCommand](newCommand.split(" ") as T[]);
+      historyEntry = await commandActions[newCommand](newCommand.split(" ") as T[]);
     } else {
       historyEntry = {
         command: newCommand,

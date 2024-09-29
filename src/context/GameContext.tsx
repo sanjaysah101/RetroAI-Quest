@@ -1,6 +1,6 @@
 import { FC, createContext, useState } from "react";
 
-import { GameStory } from "../constants/game";
+import { generateGameIntro } from "../services/geminiAI";
 import { GameCommands, GameContextType, GameScenes, GameState } from "../types/game";
 import { History, TerminalOutputType } from "../types/terminal";
 
@@ -55,10 +55,11 @@ export const GameProvider: FC<{ children: React.ReactNode }> = ({ children }) =>
     };
   };
 
-  const intro = (): History => {
+  const intro = async (): Promise<History> => {
+    const story = await generateGameIntro();
     return {
       command: "intro",
-      output: GameStory[1].intro.join("\n\n"),
+      output: story.split(".").join(".\n"),
       type: TerminalOutputType.INFO,
     };
   };
