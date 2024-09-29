@@ -1,11 +1,11 @@
 import { History, TerminalCommandHelp } from "./terminal";
 
 export type PlayerState = {
-  location: string;
-  inventory: string[];
-  decisions: PlayerDecision[];
-  hasSword: boolean;
-  playerActions: PlayerActionsOnCommand;
+  location?: string;
+  inventory?: string[];
+  decisions?: PlayerDecision[];
+  hasSword?: boolean;
+  playerActions?: PlayerActionsOnCommand;
 };
 
 export type PlayerContextType = {
@@ -46,7 +46,6 @@ export enum PlayerCommands {
   PICKUP = "pickup",
   DROP = "drop",
   USE = "use",
-  CLEAR = "clear",
   HELP = "user --help",
   INVENTORY = "inventory",
 }
@@ -57,7 +56,6 @@ export interface PlayerActionsOnCommand {
   pickup: (item: string[]) => History;
   drop: (item: string[]) => History;
   use: (item: string[]) => History;
-  clear: () => History;
   "user --help": () => History;
   inventory: () => History;
 }
@@ -86,10 +84,6 @@ export const PlayerHelpCommands: Record<PlayerCommands, TerminalCommandHelp> = {
   [PlayerCommands.USE]: {
     command: "use",
     description: "Use the item",
-  },
-  [PlayerCommands.CLEAR]: {
-    command: "clear",
-    description: "Clear the terminal",
   },
   [PlayerCommands.HELP]: {
     command: "user --help",

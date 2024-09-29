@@ -1,5 +1,6 @@
 import { FC, createContext, useState } from "react";
 
+import { GameStory } from "../constants/game";
 import { GameCommands, GameContextType, GameScenes, GameState } from "../types/game";
 import { History, TerminalOutputType } from "../types/terminal";
 
@@ -57,7 +58,7 @@ export const GameProvider: FC<{ children: React.ReactNode }> = ({ children }) =>
   const intro = (): History => {
     return {
       command: "intro",
-      output: "You see the intro",
+      output: GameStory[1].intro.join("\n\n"),
       type: TerminalOutputType.INFO,
     };
   };

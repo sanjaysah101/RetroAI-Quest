@@ -1,52 +1,24 @@
-# React + TypeScript + Vite
+# Retro AI Terminal
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A retro-style AI terminal built with React and Tailwind CSS. This terminal emulates a classic terminal interface and features a variety of commands and responses.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Classic terminal interface
+- Multiple scenes with interactive stories
+- Inventory management
+- Player actions and responses
 
-## Expanding the ESLint configuration
+## How to run
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+1. Clone the repository
+2. Run `npm install`
+3. Run `npm run dev`
 
-- Configure the top-level `parserOptions` property like this:
+## Game Scenarios
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ["./tsconfig.node.json", "./tsconfig.app.json"],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-});
-```
+The game is divided into scenes. Each scene is an array of history objects. The history objects contain the command and the output. The output is the response from the AI.
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+## Game Story
 
-```js
-// eslint.config.js
-import react from "eslint-plugin-react";
-
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: "18.3" } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs["jsx-runtime"].rules,
-  },
-});
-```
-
-# RetroAI-Quest-Hackathon
+The game story is stored in the `GameStory` constant in the `game.ts` file.

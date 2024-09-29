@@ -31,58 +31,56 @@ export const PlayerProvider: FC<{ children: React.ReactNode }> = ({ children }) 
   const makeDecision = (decision: PlayerDecision) => {
     setPlayerState((prevDecision) => ({
       ...prevDecision,
-      decisions: [...prevDecision.decisions, decision],
+      decisions: [...(prevDecision.decisions || []), decision],
     }));
   };
 
   const addItemToInventory = (item: string) => {
     setPlayerState((prevState) => ({
       ...prevState,
-      inventory: [...prevState.inventory, item],
+      inventory: [...(prevState.inventory || []), item],
     }));
   };
 
   const look = (item: string[]): History => {
-    console.log(item);
     return {
       command: "look",
-      output: "You look at the item",
-      type: TerminalOutputType.INFO,
-    };
-  };
-
-  const inventory = (): History => {
-    console.log(playerState.inventory);
-    return {
-      command: "inventory",
-      output: "You look at the item",
+      output: `You look at the ${item}`,
       type: TerminalOutputType.INFO,
     };
   };
 
   const go = (direction: string[]): History => {
-    console.log(direction);
+    console.log(direction)
     return {
-      command: "go",
-      output: "You go to the direction",
+      command: `go ${direction}`,
+      output: `You go to the ${direction}`,
       type: TerminalOutputType.INFO,
     };
   };
 
+  const inventory = (): History => {
+    return {
+      command: "inventory",
+      output: `Current inventory: ${playerState.inventory?.join(", ") || "None"}`,
+      type: TerminalOutputType.INFO,
+    };
+  };
   const pickup = (item: string[]): History => {
-    console.log(item);
+    if (item[0] === "sword") {
+      updatePlayerState([{ hasSword: true }]);
+    }
     return {
       command: "pickup",
-      output: "You pickup the item",
+      output: `You picked up ${item}`,
       type: TerminalOutputType.INFO,
     };
   };
 
   const drop = (item: string[]): History => {
-    console.log(item);
     return {
       command: "drop",
-      output: "You drop the item",
+      output: `You dropped ${item}`,
       type: TerminalOutputType.INFO,
     };
   };
@@ -91,16 +89,7 @@ export const PlayerProvider: FC<{ children: React.ReactNode }> = ({ children }) 
     console.log(item);
     return {
       command: "use",
-      output: "You use the item",
-      type: TerminalOutputType.INFO,
-    };
-  };
-
-  const clear = (): History => {
-    console.log("cleared");
-    return {
-      command: "clear",
-      output: "You cleared the terminal",
+      output: `You used ${item}`,
       type: TerminalOutputType.INFO,
     };
   };
@@ -108,7 +97,7 @@ export const PlayerProvider: FC<{ children: React.ReactNode }> = ({ children }) 
   const help = (): History => {
     console.log("help");
     return {
-      command: "help",
+      command: "user --help",
       output: "You get help",
       type: TerminalOutputType.INFO,
     };
@@ -121,7 +110,6 @@ export const PlayerProvider: FC<{ children: React.ReactNode }> = ({ children }) 
     [PlayerCommands.PICKUP]: pickup,
     [PlayerCommands.DROP]: drop,
     [PlayerCommands.USE]: use,
-    [PlayerCommands.CLEAR]: clear,
     [PlayerCommands.HELP]: help,
   };
 
