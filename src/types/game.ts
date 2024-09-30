@@ -1,5 +1,5 @@
 import { retroAIArt } from "../assets/asciiArt";
-import { Command, History, TerminalOutputType } from "./terminal";
+import { Command, CommandActionCallback, History, TerminalOutputType } from "./terminal";
 
 export type GameContextType = {
   gameState: GameState;
@@ -8,12 +8,12 @@ export type GameContextType = {
 };
 
 export interface GameActionsOnCommand {
-  "game --start": () => Promise<History>;
-  "game --end": () => Promise<History>;
-  "game --help": () => Promise<History>;
-  "game --credits": () => Promise<History>;
-  intro: () => Promise<History>;
-  game: () => Promise<History>;
+  "game --start": (args: CommandActionCallback) => Promise<History>;
+  "game --end": (args: CommandActionCallback) => Promise<History>;
+  "game --help": (args: CommandActionCallback) => Promise<History>;
+  "game --credits": (args: CommandActionCallback) => Promise<History>;
+  intro: (args: CommandActionCallback) => Promise<History>;
+  game: (arg: CommandActionCallback) => Promise<History>;
 }
 
 export type GameState = {

@@ -3,9 +3,8 @@ import { GameProvider } from "./context/GameContext";
 import { PlayerProvider } from "./context/PlayerContext";
 import { TerminalProvider } from "./context/TerminalContext";
 import { useGame } from "./hooks/useGame";
-import { usePlayer } from "./hooks/usePlayer";
+// import { usePlayer } from "./hooks/usePlayer";
 import { GameHelpCommands } from "./types/game";
-import { CommandActions } from "./types/terminal";
 
 function App() {
   return (
@@ -22,15 +21,12 @@ function App() {
 }
 
 const GameTerminal = () => {
-  const { playerActions } = usePlayer();
+  // const { playerActions } = usePlayer();
   const { gameState, gameActions } = useGame();
 
   return (
     <TerminalProvider
-      commandActions={{
-        ...(playerActions as unknown as CommandActions<string>),
-        ...(gameActions as unknown as CommandActions<string>),
-      }}
+      commandActions={{ ...gameActions }}
       username="sanjay"
       hostname="retro.ai"
       history={gameState.gameHistory}

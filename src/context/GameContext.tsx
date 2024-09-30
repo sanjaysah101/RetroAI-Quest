@@ -2,7 +2,7 @@ import { FC, createContext, useState } from "react";
 
 import { generateGameCredits, generateGameEnd, generateGameIntro, generateStartGame } from "../services/geminiAI";
 import { GameCommands, GameContextType, GameHelpCommands, GameScenes, GameState } from "../types/game";
-import { History, TerminalOutputType } from "../types/terminal";
+import { CommandActionCallback, History, TerminalOutputType } from "../types/terminal";
 import { formatHelpCommands } from "../utils";
 
 // Create GameContext
@@ -71,12 +71,16 @@ export const GameProvider: FC<{ children: React.ReactNode }> = ({ children }) =>
     };
   };
 
-  const game = async (): Promise<History> => {
+  const game = async (args: CommandActionCallback): Promise<History> => {
+    const { directoryInfo, terminalActions } = args;
+
+    terminalActions.changeDirectory("cd game");
+
     return {
       command: "game",
       output: "You enter the game. Please make a decision.",
       type: TerminalOutputType.INFO,
-      directory: "/",
+      directory: directoryInfo.currentDirectory,
     };
   };
 

@@ -19,7 +19,19 @@ export type DirectoryInfo = {
   currentDirectory: string;
 };
 
-export type CommandActions<T> = { [key: string]: (arg: T[], directoryInfo: DirectoryInfo) => Promise<History> };
+export interface CommandActionCallback {
+  command: string[];
+  directoryInfo: DirectoryInfo;
+  terminalActions: {
+    changeDirectory: (newDirectory: string, showCommandExecution?: boolean) => void;
+    changeUsername: (newUsername: string) => void;
+    changeHostname: (newHostname: string) => void;
+  };
+}
+
+export interface CommandActions {
+  [key: string]: (args: CommandActionCallback) => Promise<History>;
+}
 
 export interface History {
   command: string;

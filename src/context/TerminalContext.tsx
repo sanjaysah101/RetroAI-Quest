@@ -15,9 +15,20 @@ import { formatHelpCommands } from "../utils";
 
 export const TerminalContext = createContext<TerminalContextType | undefined>(undefined);
 
-export const TerminalProvider = <T extends string>(props: {
+const checkTerminalCommand = (commandToCheck: string, terminalCommand: string[]) => {
+  return terminalCommand.find((command) => {
+    const terminalCommandParts = command.split(" ");
+
+    return (
+      terminalCommandParts[0] === commandToCheck.split(" ")[0] &&
+      terminalCommandParts.length === commandToCheck.split(" ").length
+    );
+  });
+};
+
+export const TerminalProvider = (props: {
   children: React.ReactNode;
-  commandActions: CommandActions<T>;
+  commandActions: CommandActions;
   username: string;
   hostname: string;
   command?: string;
@@ -46,32 +57,64 @@ export const TerminalProvider = <T extends string>(props: {
     currentDirectory: directory,
   };
 
-  const checkTerminalCommand = (commandToCheck: string, terminalCommand: string[]) => {
-    console.log({ commandToCheck, terminalCommand });
-    return terminalCommand.find((command) => {
-      const terminalCommandParts = command.split(" ");
-      console.log({
-        terminalCommandParts,
-        initial: terminalCommandParts[0] === commandToCheck.split(" ")[0],
-        terminalCommandLength: terminalCommandParts.length,
-        commandToCheckLength: commandToCheck.split(" ").length,
-        length: terminalCommandParts.length === commandToCheck.split(" ").length,
-      });
-      return (
-        terminalCommandParts[0] === commandToCheck.split(" ")[0] &&
-        terminalCommandParts.length === commandToCheck.split(" ").length
-      );
-    });
+  const changeUsername = (username: string) => {
+    let historyEntry: History;
+
+    if (!username) {
+      historyEntry = {
+        command: command,
+        output: "Username not provided",
+        type: TerminalOutputType.ERROR,
+        directory: directory,
+      };
+      setHistory((prev) => [...prev, historyEntry]);
+      return;
+    }
+
+    if (command.split(" ").length > 3) {
+      historyEntry = {
+        command: command,
+        output: "Invalid command",
+        type: TerminalOutputType.ERROR,
+        directory: directory,
+      };
+      setHistory((prev) => [...prev, historyEntry]);
+      return;
+    }
+
+    setUsername(username);
+  };
+
+  const changeHostname = (hostname: string) => {
+    let historyEntry: History;
+    if (!hostname) {
+      historyEntry = {
+        command: command,
+        output: "Hostname not provided",
+        type: TerminalOutputType.ERROR,
+        directory: directory,
+      };
+      setHistory((prev) => [...prev, historyEntry]);
+      return;
+    }
+
+    if (command.split(" ").length > 3) {
+      historyEntry = {
+        command: command,
+        output: "Invalid command",
+        type: TerminalOutputType.ERROR,
+        directory: directory,
+      };
+      setHistory((prev) => [...prev, historyEntry]);
+      return;
+    }
+
+    setHostname(hostname);
   };
 
   const executeTerminalCommand = async (command: string) => {
     const commandParts = command.split(" ");
     const baseCommand = commandParts[0];
-
-    // const isTerminalCommand = Object.values(TerminalCommand).find((command) => {
-    //   const terminalCommandParts = command.split(" ");
-    //   return terminalCommandParts[0] === baseCommand && terminalCommandParts.length === commandParts.length;
-    // });
 
     let historyEntry: History;
 
@@ -81,60 +124,12 @@ export const TerminalProvider = <T extends string>(props: {
     }
 
     if (checkTerminalCommand(command, [TerminalCommand.SET_USERNAME])) {
-      const username = command.split(" ")[2];
-
-      if (!username) {
-        historyEntry = {
-          command: command,
-          output: "Username not provided",
-          type: TerminalOutputType.ERROR,
-          directory: directory,
-        };
-        setHistory((prev) => [...prev, historyEntry]);
-        return;
-      }
-
-      if (command.split(" ").length > 3) {
-        historyEntry = {
-          command: command,
-          output: "Invalid command",
-          type: TerminalOutputType.ERROR,
-          directory: directory,
-        };
-        setHistory((prev) => [...prev, historyEntry]);
-        return;
-      }
-
-      setUsername(username);
+      changeUsername(command.split(" ")[2]);
       return;
     }
 
     if (checkTerminalCommand(command, [TerminalCommand.SET_HOSTNAME])) {
-      const hostname = command.split(" ")[2];
-
-      if (!hostname) {
-        historyEntry = {
-          command: command,
-          output: "Hostname not provided",
-          type: TerminalOutputType.ERROR,
-          directory: directory,
-        };
-        setHistory((prev) => [...prev, historyEntry]);
-        return;
-      }
-
-      if (command.split(" ").length > 3) {
-        historyEntry = {
-          command: command,
-          output: "Invalid command",
-          type: TerminalOutputType.ERROR,
-          directory: directory,
-        };
-        setHistory((prev) => [...prev, historyEntry]);
-        return;
-      }
-
-      setHostname(hostname);
+      changeHostname(command.split(" ")[2]);
       return;
     }
 
@@ -167,13 +162,22 @@ export const TerminalProvider = <T extends string>(props: {
         return;
       }
 
-      const newDirectory = commandParts[1];
-      changeDirectory(newDirectory);
+      // const newDirectory = commandParts[1];
+      historyEntry = changeDirectory(command, true);
+      setHistory((prev) => [...prev, historyEntry]);
       return;
     }
 
     if (commandActions[command]) {
-      historyEntry = await commandActions[command](command.split(" ") as T[], directoryInfo);
+      historyEntry = await commandActions[command]({
+        command: command.split(" "),
+        directoryInfo,
+        terminalActions: {
+          changeDirectory,
+          changeHostname,
+          changeUsername,
+        },
+      });
       setHistory((prev) => [...prev, historyEntry]);
       return;
     }
@@ -197,9 +201,6 @@ export const TerminalProvider = <T extends string>(props: {
 
       console.log(newCommand, commandParts, baseCommand);
 
-      // const isTerminalCommand =
-      //   Object.values(TerminalCommand).includes(baseCommand as TerminalCommand) || newCommand.startsWith(TerminalCommand);
-
       const isTerminalCommand = checkTerminalCommand(newCommand, Object.values(TerminalCommand));
       console.log({ isTerminalCommand });
 
@@ -208,8 +209,15 @@ export const TerminalProvider = <T extends string>(props: {
         return;
       }
 
-      const historyEntry = await commandActions[newCommand](newCommand.split(" ") as T[], directoryInfo);
-
+      const historyEntry = await commandActions[newCommand]({
+        command: commandParts,
+        directoryInfo,
+        terminalActions: {
+          changeDirectory,
+          changeHostname,
+          changeUsername,
+        },
+      });
       setHistory((prev) => [...prev, historyEntry]);
       setCommand(newCommand);
     } catch (error) {
@@ -225,20 +233,17 @@ export const TerminalProvider = <T extends string>(props: {
     }
   };
 
-  const changeDirectory = async (newDirectory: string) => {
+  const changeDirectory = (command: string, showCommandExecution: boolean = false): History => {
+    const newDirectory = command.split(" ").pop() || "";
+
     if (newDirectory === "..") {
       if (directory === "/") {
-        // Already at root, can't go up
-        setHistory((prev) => [
-          ...prev,
-          {
-            command: `cd ..`,
-            output: `Already at root, can't go up`,
-            type: TerminalOutputType.INFO,
-            directory: directory,
-          },
-        ]);
-        return;
+        return {
+          command: command,
+          output: `Already at root, can't go up`,
+          type: TerminalOutputType.INFO,
+          directory: directory,
+        };
       }
       if (directory === "~") {
         setDirectory("/");
@@ -249,21 +254,21 @@ export const TerminalProvider = <T extends string>(props: {
       }
     } else if (newDirectory.startsWith("/")) {
       // Absolute path
-      setDirectory(`${username}@${hostname}/${newDirectory}:~$`);
+      setDirectory(`${username}@${hostname}:${newDirectory}`);
     } else if (directory === "/") {
       setDirectory("/" + newDirectory);
     } else {
       setDirectory(`${directory}/${newDirectory}`);
     }
 
-    // Add a history entry for the successful directory change
     const historyEntry: History = {
-      command: `cd ${newDirectory}`,
-      output: `Changed directory to: ${newDirectory}`,
+      command: showCommandExecution ? command : newDirectory,
+      output: showCommandExecution ? `Changed directory to: ${newDirectory}` : "",
       type: TerminalOutputType.INFO,
       directory: directory,
     };
-    setHistory((prev) => [...prev, historyEntry]);
+
+    return historyEntry;
   };
 
   return (
