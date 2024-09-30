@@ -1,65 +1,109 @@
-export const GameStory = [
-  {
-    intro: [
-      "You are a hacker in a world where everything is connected to the internet.",
-      "You have to hack into the mainframe to stop the apocalypse.",
-      "You are in a room with a lot of computers and a lot of people.",
-      "You see a woman in a blue shirt and black pants.",
-      "She is typing on a computer.",
-      "You walk up to her and say 'Hello, I am Sanjay'",
-      "She looks up at you and says 'Oh, you're the new guy'",
-      "You say 'Yeah, I am'",
-      "She says 'What do you do?'",
-      "You say 'I am a hacker'",
-    ],
-    dialogs: [
-      {
-        command: "I am a hacker",
-        choices: [
-          {
-            command: "What do you do?",
-          },
-        ],
-      },
-      {
-        command: "I need to access the mainframe. Can you help me?",
-        choices: [
-          {
-            command: "Yes, I can help you.",
-            response: [
-              {
-                command: "Great! Follow me to the secure terminal.",
-              },
-              {
-                command: "What do I need to do?",
-              },
-              {
-                command: "You'll need to bypass the security protocols first.",
-              },
-            ],
-          },
-          {
-            text: "No, I work alone.",
-            response: [
-              {
-                command: "Be careful. This isn't a game.",
-              },
-              {
-                command: "I can handle myself.",
-              },
-            ],
-          },
-        ],
-      },
-    ],
-  },
-  {
-    intro: [
-      "You awaken in a dimly lit room, the hum of an ancient computer resonating through the walls.",
-      "Before you is a retro terminal with flickering green text.",
-      "The machine displays a message:",
-      "Welcome to retro.ai",
-    ],
-    dialogs: [],
-  },
-];
+import { DragonLairStory, EldoriaStory, ForestStory, Inventory } from "../types/player";
+
+export const GameStory = {
+  intro: [
+    "You stand at a crossroads.",
+    "A weathered signpost points towards three paths:",
+    " - The road to Eldoria,",
+    " - the mountain trail to the Dragon’s Lair, or",
+    " - the forest path that whispers of forgotten magic.",
+    "",
+    "Which path do you choose?",
+    "",
+    "Options",
+    "   1. Eldoria",
+    "   2. Dragon’s Lair",
+    "   3. Forest Path",
+    "",
+    `   <span class="text-[#B89076]">To go Eldoria, type </span> - <span class="text-blue-300">go eldoria</span>`,
+    `   <span class="text-[#B89076]">To go dragon-lair, type </span> - <span class="text-blue-300">go dragon-lair</span>`,
+    `   <span class="text-[#B89076]">To go forest, type </span> - <span class="text-blue-300">go forest</span>`,
+  ],
+  [EldoriaStory.ELDORIA_A]: [
+    "You arrive in Eldoria, a bustling city with political tension brewing.",
+    "A noble approaches you.",
+    "",
+    "Noble: 'Welcome to Eldoria, traveler. Strange times these are, with whispers of conspiracy in the air. Do you seek knowledge, power, or neutrality?'",
+    "",
+    "Options",
+    "   1. Ally with the ruling family",
+    "   2. Investigate the conspiracy",
+    "   3. Remain neutral",
+    "",
+    `   <span class="text-[#B89076]">To ally with the ruling family, type </span> - <span class="text-blue-300">ally ruling-family</span>`,
+    `   <span class="text-[#B89076]">To investigate the conspiracy, type </span> - <span class="text-blue-300">investigate conspiracy</span>`,
+    `   <span class="text-[#B89076]">To remain neutral, type </span> - <span class="text-blue-300">remain neutral</span>`,
+  ],
+  [EldoriaStory.ELDORIA_B]: [
+    "You take a detour and reach a small village. The air is thick with worry and sickness.",
+    "A villager rushes up to you, coughing and pleading.",
+    "",
+    "Villager: 'Please, traveler, our people are sick. Can you help us?'",
+    "",
+    "Options",
+    "   1. Help the villagers find a cure",
+    "   2. Ignore the villagers and continue",
+    "",
+    `   <span class="text-[#B89076]">To help the villagers, type </span> - <span class="text-blue-300">find cure</span>`,
+    `   <span class="text-[#B89076]">To ignore the villagers, type </span> - <span class="text-blue-300">ignore villagers</span>`,
+  ],
+  [DragonLairStory.DRAGON_LAIR_A]: [
+    "You march boldly to the Dragon's Lair. The ground shakes beneath you as the great beast emerges.",
+    "",
+    "Dragon: 'You dare to challenge me, mortal? Prepare to meet your fate!'",
+    "",
+    "Options",
+    "   1. Attack the dragon",
+    "   2. Flee",
+    "",
+    `   <span class="text-[#B89076]">To attack the dragon, type </span> - <span class="text-blue-300">attack dragon</span>`,
+    `   <span class="text-[#B89076]">To flee, type </span> - <span class="text-blue-300">flee</span>`,
+  ],
+  [DragonLairStory.DRAGON_LAIR_B]: [
+    "You approach the dragon's lair but choose a hidden path. An ancient guardian awaits, watching silently.",
+    "",
+    "Guardian: 'The dragon is not your enemy, adventurer. There is more at stake here. Will you listen, or must I stop you?'",
+    "",
+    "Options",
+    "   1. Negotiate with the guardian",
+    "   2. Fight the guardian",
+    "",
+    `   <span class="text-[#B89076]">To negotiate, type </span> - <span class="text-blue-300">negotiate</span>`,
+    `   <span class="text-[#B89076]">To fight, type </span> - <span class="text-blue-300">fight guardian</span>`,
+  ],
+  [ForestStory.FOREST_A]: [
+    "You step into the deep, dark forest. The air grows thick with mystery, and strange creatures stir.",
+    "",
+    "Forest Spirit: 'The forest hides many secrets. Will you brave its depths, or will fear guide you?'",
+    "",
+    "Options",
+    "   1. Explore the ancient ruins",
+    "   2. Escape the forest",
+    "",
+    `   <span class="text-[#B89076]">To explore the ruins, type </span> - <span class="text-blue-300">explore ruins</span>`,
+    `   <span class="text-[#B89076]">To escape the forest, type </span> - <span class="text-blue-300">escape ruins</span>`,
+  ],
+  [ForestStory.FOREST_B]: [
+    "The voices call to you, leading you deeper into the grove. You come upon an ancient spirit, glowing with ethereal energy.",
+    "",
+    "Spirit: 'I have guarded this grove for millennia. Will you aid me in restoring balance, or shall you leave in peace?'",
+    "",
+    "Options",
+    "   1. Help the spirit",
+    "   2. Leave the grove",
+    "",
+    `   <span class="text-[#B89076]">To help the spirit, type </span> - <span class="text-blue-300">help spirit</span>`,
+    `   <span class="text-[#B89076]">To leave the grove, type </span> - <span class="text-blue-300">leave grove</span>`,
+  ],
+  [Inventory.HEALING_HERB]: [
+    "You gather the rare herb and mix a potion to cure the villagers.",
+    "The villagers rejoice and offer you their gratitude.",
+    "You've gained a 'Healing Herb' in your inventory.",
+  ],
+  [Inventory.DRAGON_VICTORY]: [
+    "With a mighty blow, the dragon falls. You claim its treasure, and the townspeople celebrate your legendary status.",
+    "You've gained 'Dragon Scales' and 'Dragon's Treasure' in your inventory.",
+  ],
+  [Inventory.DRAGON_SCALES]: ["You've gained 'Dragon Scales' in your inventory."],
+  [Inventory.DRAGON_TREASURE]: ["You've gained 'Dragon's Treasure' in your inventory."],
+};

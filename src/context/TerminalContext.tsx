@@ -11,20 +11,9 @@ import {
   TerminalContextType,
   TerminalOutputType,
 } from "../types/terminal";
-import { formatHelpCommands } from "../utils";
+import { checkTerminalCommand, formatHelpCommands } from "../utils";
 
 export const TerminalContext = createContext<TerminalContextType | undefined>(undefined);
-
-const checkTerminalCommand = (commandToCheck: string, terminalCommand: string[]) => {
-  return terminalCommand.find((command) => {
-    const terminalCommandParts = command.split(" ");
-
-    return (
-      terminalCommandParts[0] === commandToCheck.split(" ")[0] &&
-      terminalCommandParts.length === commandToCheck.split(" ").length
-    );
-  });
-};
 
 export const TerminalProvider = (props: {
   children: React.ReactNode;
@@ -48,7 +37,7 @@ export const TerminalProvider = (props: {
   const [hostname, setHostname] = useState<string>(initialHostname);
   const [command, setCommand] = useState<string>(initialCommand || "");
   const [history, setHistory] = useState<History[]>(initialHistory || []);
-  const [directory, setDirectory] = useState<string>("");
+  const [directory, setDirectory] = useState<string>("~");
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const directoryInfo: DirectoryInfo = {
@@ -168,19 +157,19 @@ export const TerminalProvider = (props: {
       return;
     }
 
-    if (commandActions[command]) {
-      historyEntry = await commandActions[command]({
-        command: command.split(" "),
-        directoryInfo,
-        terminalActions: {
-          changeDirectory,
-          changeHostname,
-          changeUsername,
-        },
-      });
-      setHistory((prev) => [...prev, historyEntry]);
-      return;
-    }
+    // if (commandActions[command]) {
+    //   historyEntry = await commandActions[command]({
+    //     command: command.split(" "),
+    //     directoryInfo,
+    //     terminalActions: {
+    //       changeDirectory,
+    //       changeHostname,
+    //       changeUsername,
+    //     },
+    //   });
+    //   setHistory((prev) => [...prev, historyEntry]);
+    //   return;
+    // }
 
     historyEntry = {
       command: command,
@@ -196,21 +185,16 @@ export const TerminalProvider = (props: {
     try {
       setIsLoading(true);
       newCommand = newCommand.trim();
-      const commandParts = newCommand.split(" ");
-      const baseCommand = commandParts[0];
-
-      console.log(newCommand, commandParts, baseCommand);
 
       const isTerminalCommand = checkTerminalCommand(newCommand, Object.values(TerminalCommand));
-      console.log({ isTerminalCommand });
 
       if (isTerminalCommand) {
         executeTerminalCommand(newCommand);
         return;
       }
 
-      const historyEntry = await commandActions[newCommand]({
-        command: commandParts,
+      const historyEntry = await commandActions({
+        command: newCommand,
         directoryInfo,
         terminalActions: {
           changeDirectory,
@@ -219,17 +203,19 @@ export const TerminalProvider = (props: {
         },
       });
       setHistory((prev) => [...prev, historyEntry]);
-      setCommand(newCommand);
+      return;
     } catch (error) {
+      console.error(error);
       const errorEntry: History = {
         command: newCommand,
-        output: `Error while executing command: ${(error as Error).message}`,
+        output: `Unknown command: ${newCommand}. For a list of commands, type <span class="text-blue-300">"help"</span></span>`,
         type: TerminalOutputType.ERROR,
         directory: directory,
       };
       setHistory((prev) => [...prev, errorEntry]);
     } finally {
       setIsLoading(false);
+      setCommand(newCommand);
     }
   };
 

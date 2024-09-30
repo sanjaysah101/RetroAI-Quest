@@ -20,7 +20,7 @@ export type DirectoryInfo = {
 };
 
 export interface CommandActionCallback {
-  command: string[];
+  command: string;
   directoryInfo: DirectoryInfo;
   terminalActions: {
     changeDirectory: (newDirectory: string, showCommandExecution?: boolean) => void;
@@ -29,9 +29,7 @@ export interface CommandActionCallback {
   };
 }
 
-export interface CommandActions {
-  [key: string]: (args: CommandActionCallback) => Promise<History>;
-}
+export type CommandActions = (args: CommandActionCallback) => Promise<History>;
 
 export interface History {
   command: string;
