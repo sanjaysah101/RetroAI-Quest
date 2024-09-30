@@ -52,6 +52,15 @@ export const GameProvider: FC<{ children: React.ReactNode }> = ({ children }) =>
     };
   };
 
+  const intro = async (args: CommandActionCallback): Promise<History> => {
+    return {
+      command: GameCommands.INTRO,
+      output: GameStory.intro.join("\n"),
+      type: TerminalOutputType.INFO,
+      directory: args.directoryInfo.currentDirectory,
+    };
+  };
+
   const gameActionMapper = async (args: CommandActionCallback): Promise<History> => {
     if (checkTerminalCommand(args.command, [GameCommands.GAME])) {
       return game(args);
@@ -59,6 +68,10 @@ export const GameProvider: FC<{ children: React.ReactNode }> = ({ children }) =>
 
     if (checkTerminalCommand(args.command, [GameCommands.HELP], true)) {
       return help(args);
+    }
+
+    if (checkTerminalCommand(args.command, [GameCommands.INTRO], true)) {
+      return intro(args);
     }
 
     return {
