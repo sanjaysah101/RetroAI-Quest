@@ -1,6 +1,6 @@
-import { TerminalCommandHelp } from "../types/terminal";
+import { Command } from "../types/terminal";
 
-export const formatHelpCommands = (commands: TerminalCommandHelp[]) =>
+export const formatHelpCommands = (commands: Command[]) =>
   commands
     .map(
       ({ command, description }) =>

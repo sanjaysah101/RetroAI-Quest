@@ -1,4 +1,4 @@
-import { History, TerminalCommandHelp } from "./terminal";
+import { Command, History } from "./terminal";
 
 export type PlayerState = {
   location?: string;
@@ -61,7 +61,7 @@ export interface PlayerActionsOnCommand {
   inventory: () => Promise<History>;
 }
 
-export const PlayerHelpCommands: Record<PlayerCommands, TerminalCommandHelp> = {
+export const PlayerHelpCommands: Record<PlayerCommands, Command> = {
   [PlayerCommands.LOOK]: {
     command: "look",
     description: "Look at the item",

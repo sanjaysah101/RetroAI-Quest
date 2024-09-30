@@ -2,7 +2,9 @@ import { createContext, useState } from "react";
 
 import { helpArt } from "../assets/asciiArt";
 import {
+  Command,
   CommandActions,
+  DirectoryInfo,
   History,
   TerminalCommand,
   TerminalCommandHelp,
@@ -19,7 +21,7 @@ export const TerminalProvider = <T extends string>(props: {
   username: string;
   hostname: string;
   command?: string;
-  helpCommand?: TerminalCommandHelp[];
+  extentCommand?: Command[];
   history?: History[];
 }) => {
   const {
@@ -29,43 +31,75 @@ export const TerminalProvider = <T extends string>(props: {
     hostname: initialHostname,
     command: initialCommand,
     history: initialHistory,
-    helpCommand,
+    extentCommand,
   } = props;
   const [username, setUsername] = useState<string>(initialUsername);
   const [hostname, setHostname] = useState<string>(initialHostname);
   const [command, setCommand] = useState<string>(initialCommand || "");
   const [history, setHistory] = useState<History[]>(initialHistory || []);
+  const [directory, setDirectory] = useState<string>("");
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const handleCommand = async (newCommand: string) => {
-    let historyEntry: History = {
-      command: newCommand,
-      output: `Command changed to: ${newCommand}`,
-      type: TerminalOutputType.INFO,
-    };
+  const directoryInfo: DirectoryInfo = {
+    isRootDirectory: directory === "/",
+    isHomeDirectory: directory === "~",
+    currentDirectory: directory,
+  };
 
-    if (newCommand === TerminalCommand.CLEAR) {
+  const checkTerminalCommand = (commandToCheck: string, terminalCommand: string[]) => {
+    console.log({ commandToCheck, terminalCommand });
+    return terminalCommand.find((command) => {
+      const terminalCommandParts = command.split(" ");
+      console.log({
+        terminalCommandParts,
+        initial: terminalCommandParts[0] === commandToCheck.split(" ")[0],
+        terminalCommandLength: terminalCommandParts.length,
+        commandToCheckLength: commandToCheck.split(" ").length,
+        length: terminalCommandParts.length === commandToCheck.split(" ").length,
+      });
+      return (
+        terminalCommandParts[0] === commandToCheck.split(" ")[0] &&
+        terminalCommandParts.length === commandToCheck.split(" ").length
+      );
+    });
+  };
+
+  const executeTerminalCommand = async (command: string) => {
+    const commandParts = command.split(" ");
+    const baseCommand = commandParts[0];
+
+    // const isTerminalCommand = Object.values(TerminalCommand).find((command) => {
+    //   const terminalCommandParts = command.split(" ");
+    //   return terminalCommandParts[0] === baseCommand && terminalCommandParts.length === commandParts.length;
+    // });
+
+    let historyEntry: History;
+
+    if (baseCommand === TerminalCommand.CLEAR) {
       setHistory([]);
       return;
     }
 
-    if (newCommand.startsWith(TerminalCommand.SET_USERNAME)) {
-      const username = newCommand.split(" ")[2];
+    if (checkTerminalCommand(command, [TerminalCommand.SET_USERNAME])) {
+      const username = command.split(" ")[2];
 
       if (!username) {
         historyEntry = {
-          command: newCommand,
+          command: command,
           output: "Username not provided",
           type: TerminalOutputType.ERROR,
+          directory: directory,
         };
         setHistory((prev) => [...prev, historyEntry]);
         return;
       }
 
-      if (newCommand.split(" ").length > 3) {
+      if (command.split(" ").length > 3) {
         historyEntry = {
-          command: newCommand,
+          command: command,
           output: "Invalid command",
           type: TerminalOutputType.ERROR,
+          directory: directory,
         };
         setHistory((prev) => [...prev, historyEntry]);
         return;
@@ -75,24 +109,26 @@ export const TerminalProvider = <T extends string>(props: {
       return;
     }
 
-    if (newCommand.startsWith(TerminalCommand.SET_HOSTNAME)) {
-      const hostname = newCommand.split(" ")[2];
+    if (checkTerminalCommand(command, [TerminalCommand.SET_HOSTNAME])) {
+      const hostname = command.split(" ")[2];
 
       if (!hostname) {
         historyEntry = {
-          command: newCommand,
+          command: command,
           output: "Hostname not provided",
           type: TerminalOutputType.ERROR,
+          directory: directory,
         };
         setHistory((prev) => [...prev, historyEntry]);
         return;
       }
 
-      if (newCommand.split(" ").length > 3) {
+      if (command.split(" ").length > 3) {
         historyEntry = {
-          command: newCommand,
+          command: command,
           output: "Invalid command",
           type: TerminalOutputType.ERROR,
+          directory: directory,
         };
         setHistory((prev) => [...prev, historyEntry]);
         return;
@@ -102,35 +138,132 @@ export const TerminalProvider = <T extends string>(props: {
       return;
     }
 
-    if (newCommand === TerminalCommand.HELP) {
+    if (command === TerminalCommand.HELP) {
       const historyEntry = {
-        command: newCommand,
+        command: command,
         output:
           helpArt +
           "\n\n" +
           "\nAvailable commands\n\n" +
           formatHelpCommands(Object.values(TerminalCommandHelp)) +
           "\n\n" +
-          (helpCommand ? formatHelpCommands(helpCommand) : ""),
+          (extentCommand ? formatHelpCommands(extentCommand) : ""),
         type: TerminalOutputType.INFO,
+        directory: directory,
       };
       setHistory((prev) => [...prev, historyEntry]);
       return;
     }
 
-    // Execute the action if it exists
-    if (commandActions[newCommand]) {
-      historyEntry = await commandActions[newCommand](newCommand.split(" ") as T[]);
-    } else {
-      historyEntry = {
-        command: newCommand,
-        output: `Unknown command: ${newCommand}. For a list of commands, type <span class="text-blue-300">"help"</span></span>`,
-        type: TerminalOutputType.ERROR,
-      };
+    if (checkTerminalCommand(command, [TerminalCommand.CD])) {
+      if (commandParts.length !== 2) {
+        historyEntry = {
+          command: command,
+          output: "Usage: cd <directory>",
+          type: TerminalOutputType.ERROR,
+          directory: directory,
+        };
+        setHistory((prev) => [...prev, historyEntry]);
+        return;
+      }
+
+      const newDirectory = commandParts[1];
+      changeDirectory(newDirectory);
+      return;
     }
 
+    if (commandActions[command]) {
+      historyEntry = await commandActions[command](command.split(" ") as T[], directoryInfo);
+      setHistory((prev) => [...prev, historyEntry]);
+      return;
+    }
+
+    historyEntry = {
+      command: command,
+      output: `Unknown command: ${command}. For a list of commands, type <span class="text-blue-300">"help"</span></span>`,
+      type: TerminalOutputType.ERROR,
+      directory: directory,
+    };
     setHistory((prev) => [...prev, historyEntry]);
-    setCommand(newCommand);
+    return;
+  };
+
+  const handleCommand = async (newCommand: string) => {
+    try {
+      setIsLoading(true);
+      newCommand = newCommand.trim();
+      const commandParts = newCommand.split(" ");
+      const baseCommand = commandParts[0];
+
+      console.log(newCommand, commandParts, baseCommand);
+
+      // const isTerminalCommand =
+      //   Object.values(TerminalCommand).includes(baseCommand as TerminalCommand) || newCommand.startsWith(TerminalCommand);
+
+      const isTerminalCommand = checkTerminalCommand(newCommand, Object.values(TerminalCommand));
+      console.log({ isTerminalCommand });
+
+      if (isTerminalCommand) {
+        executeTerminalCommand(newCommand);
+        return;
+      }
+
+      const historyEntry = await commandActions[newCommand](newCommand.split(" ") as T[], directoryInfo);
+
+      setHistory((prev) => [...prev, historyEntry]);
+      setCommand(newCommand);
+    } catch (error) {
+      const errorEntry: History = {
+        command: newCommand,
+        output: `Error while executing command: ${(error as Error).message}`,
+        type: TerminalOutputType.ERROR,
+        directory: directory,
+      };
+      setHistory((prev) => [...prev, errorEntry]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const changeDirectory = async (newDirectory: string) => {
+    if (newDirectory === "..") {
+      if (directory === "/") {
+        // Already at root, can't go up
+        setHistory((prev) => [
+          ...prev,
+          {
+            command: `cd ..`,
+            output: `Already at root, can't go up`,
+            type: TerminalOutputType.INFO,
+            directory: directory,
+          },
+        ]);
+        return;
+      }
+      if (directory === "~") {
+        setDirectory("/");
+      } else {
+        const parts = directory.split("/");
+        parts.pop();
+        setDirectory(parts.join("/") || "/");
+      }
+    } else if (newDirectory.startsWith("/")) {
+      // Absolute path
+      setDirectory(`${username}@${hostname}/${newDirectory}:~$`);
+    } else if (directory === "/") {
+      setDirectory("/" + newDirectory);
+    } else {
+      setDirectory(`${directory}/${newDirectory}`);
+    }
+
+    // Add a history entry for the successful directory change
+    const historyEntry: History = {
+      command: `cd ${newDirectory}`,
+      output: `Changed directory to: ${newDirectory}`,
+      type: TerminalOutputType.INFO,
+      directory: directory,
+    };
+    setHistory((prev) => [...prev, historyEntry]);
   };
 
   return (
@@ -140,7 +273,10 @@ export const TerminalProvider = <T extends string>(props: {
         history,
         username,
         hostname,
+        directory,
+        isLoading,
         handleCommand,
+        changeDirectory,
       }}
     >
       {children}

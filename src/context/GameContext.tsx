@@ -33,6 +33,7 @@ export const GameProvider: FC<{ children: React.ReactNode }> = ({ children }) =>
       command: "game --start",
       output: story.split(".").join(".\n"),
       type: TerminalOutputType.INFO,
+      directory: "/",
     };
   };
 
@@ -47,6 +48,7 @@ export const GameProvider: FC<{ children: React.ReactNode }> = ({ children }) =>
       command: "game --end",
       output: story.split(".").join(".\n"),
       type: TerminalOutputType.INFO,
+      directory: "/",
     };
   };
 
@@ -55,6 +57,7 @@ export const GameProvider: FC<{ children: React.ReactNode }> = ({ children }) =>
       command: "game --help",
       output: formatHelpCommands(Object.values(GameHelpCommands)),
       type: TerminalOutputType.INFO,
+      directory: "/",
     };
   };
 
@@ -64,6 +67,7 @@ export const GameProvider: FC<{ children: React.ReactNode }> = ({ children }) =>
       command: "intro",
       output: story.split(".").join(".\n"),
       type: TerminalOutputType.INFO,
+      directory: "/",
     };
   };
 
@@ -72,6 +76,7 @@ export const GameProvider: FC<{ children: React.ReactNode }> = ({ children }) =>
       command: "game",
       output: "You enter the game. Please make a decision.",
       type: TerminalOutputType.INFO,
+      directory: "/",
     };
   };
 
@@ -81,6 +86,7 @@ export const GameProvider: FC<{ children: React.ReactNode }> = ({ children }) =>
       command: "credits",
       output: story.split(".").join(".\n"),
       type: TerminalOutputType.INFO,
+      directory: "/",
     };
   };
 

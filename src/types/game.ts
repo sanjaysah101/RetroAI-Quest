@@ -1,5 +1,5 @@
 import { retroAIArt } from "../assets/asciiArt";
-import { History, TerminalCommandHelp, TerminalOutputType } from "./terminal";
+import { Command, History, TerminalOutputType } from "./terminal";
 
 export type GameContextType = {
   gameState: GameState;
@@ -30,7 +30,7 @@ export enum GameCommands {
   CREDITS = "game --credits",
 }
 
-export const GameHelpCommands: Record<GameCommands, TerminalCommandHelp> = {
+export const GameHelpCommands: Record<GameCommands, Command> = {
   [GameCommands.INTRO]: {
     command: "intro",
     description: "Show the intro scene",
@@ -69,6 +69,7 @@ export const GameScenes: Record<GameCommands, History[]> = {
         `<span class="text-[#B89076]">For a list of available commands, type </span> - <span class="text-blue-300">help</span>`,
       ].join("\n\n"),
       type: TerminalOutputType.INITIAL,
+      directory: "/",
     },
   ],
   [GameCommands.GAME]: [
@@ -76,6 +77,7 @@ export const GameScenes: Record<GameCommands, History[]> = {
       command: GameCommands.GAME,
       output: ["You are in the game"].join("\n\n"),
       type: TerminalOutputType.INITIAL,
+      directory: "/",
     },
   ],
   [GameCommands.START]: [
@@ -83,6 +85,7 @@ export const GameScenes: Record<GameCommands, History[]> = {
       command: GameCommands.START,
       output: ["You have started the game"].join("\n\n"),
       type: TerminalOutputType.INITIAL,
+      directory: "/",
     },
   ],
   [GameCommands.END]: [
@@ -90,6 +93,7 @@ export const GameScenes: Record<GameCommands, History[]> = {
       command: GameCommands.END,
       output: ["You have reached the end of the game"].join("\n\n"),
       type: TerminalOutputType.INITIAL,
+      directory: "/",
     },
   ],
   [GameCommands.HELP]: [
@@ -97,6 +101,7 @@ export const GameScenes: Record<GameCommands, History[]> = {
       command: GameCommands.HELP,
       output: ["You have reached the end of the game"].join("\n\n"),
       type: TerminalOutputType.INITIAL,
+      directory: "/",
     },
   ],
   [GameCommands.CREDITS]: [
@@ -104,6 +109,7 @@ export const GameScenes: Record<GameCommands, History[]> = {
       command: GameCommands.CREDITS,
       output: ["You have reached the end of the game"].join("\n\n"),
       type: TerminalOutputType.INITIAL,
+      directory: "/",
     },
   ],
 };

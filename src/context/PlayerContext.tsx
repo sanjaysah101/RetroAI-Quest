@@ -57,6 +57,7 @@ export const PlayerProvider: FC<{ children: React.ReactNode }> = ({ children }) 
       command: "look",
       output: response + "\n\n" + asciiArt,
       type: TerminalOutputType.INFO,
+      directory: playerState.location || "",
     };
   };
 
@@ -66,6 +67,7 @@ export const PlayerProvider: FC<{ children: React.ReactNode }> = ({ children }) 
       command: `go ${direction}`,
       output: response,
       type: TerminalOutputType.INFO,
+      directory: playerState.location || "",
     };
   };
 
@@ -77,6 +79,7 @@ export const PlayerProvider: FC<{ children: React.ReactNode }> = ({ children }) 
       command: "inventory",
       output: response + "\n\n" + asciiArt + `\nCurrent inventory: ${playerState.inventory?.join(", ") || "None"}`,
       type: TerminalOutputType.INFO,
+      directory: playerState.location || "",
     };
   };
 
@@ -87,6 +90,7 @@ export const PlayerProvider: FC<{ children: React.ReactNode }> = ({ children }) 
       command: "pickup",
       output: `You picked up ${item}`,
       type: TerminalOutputType.INFO,
+      directory: playerState.location || "",
     };
   };
 
@@ -95,6 +99,7 @@ export const PlayerProvider: FC<{ children: React.ReactNode }> = ({ children }) 
       command: "drop",
       output: `You dropped ${item}`,
       type: TerminalOutputType.INFO,
+      directory: playerState.location || "",
     };
   };
 
@@ -104,6 +109,7 @@ export const PlayerProvider: FC<{ children: React.ReactNode }> = ({ children }) 
       command: "use",
       output: `You used ${item}`,
       type: TerminalOutputType.INFO,
+      directory: playerState.location || "",
     };
   };
 
@@ -113,6 +119,7 @@ export const PlayerProvider: FC<{ children: React.ReactNode }> = ({ children }) 
       command: "user --help",
       output: response,
       type: TerminalOutputType.INFO,
+      directory: playerState.location || "",
     };
   };
 

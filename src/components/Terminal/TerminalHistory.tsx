@@ -9,18 +9,16 @@ const terminalTypeStyle = {
   [TerminalOutputType.INITIAL]: "text-white",
 };
 
-const TerminalHistory = () => {
+export const TerminalHistory = () => {
   const { history } = useTerminal();
 
-  return history.map(({ output, type, command }, index) => (
+  return history.map(({ output, type, command, directory }, index) => (
     <div key={index}>
-      {type !== "initial" && <CommandPrompt />}
-      {type !== "initial" && <span className="text-custom-green">{command}</span>}
+      {type !== TerminalOutputType.INITIAL && <CommandPrompt directory={directory} />}
+      {type !== TerminalOutputType.INITIAL && <span className="text-custom-green">{command}</span>}
       <div className={`whitespace-pre-wrap p-2 ${terminalTypeStyle[type]}`}>
         <TypingEffect text={output} />
       </div>
     </div>
   ));
 };
-
-export default TerminalHistory;

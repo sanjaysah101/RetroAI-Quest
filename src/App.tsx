@@ -5,7 +5,6 @@ import { TerminalProvider } from "./context/TerminalContext";
 import { useGame } from "./hooks/useGame";
 import { usePlayer } from "./hooks/usePlayer";
 import { GameHelpCommands } from "./types/game";
-import { PlayerHelpCommands } from "./types/player";
 import { CommandActions } from "./types/terminal";
 
 function App() {
@@ -35,7 +34,7 @@ const GameTerminal = () => {
       username="sanjay"
       hostname="retro.ai"
       history={gameState.gameHistory}
-      helpCommand={[...Object.values(PlayerHelpCommands), ...Object.values(GameHelpCommands)]}
+      extentCommand={Object.values(GameHelpCommands)}
     >
       <Terminal />
     </TerminalProvider>
