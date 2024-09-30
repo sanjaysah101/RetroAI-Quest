@@ -11,6 +11,8 @@
 - **NLP (Natural Language Processing):** Players can interact with the game using free-form commands instead of rigid text options.
 - **Replay ability:** Every play through offers a different story due to the dynamic AI elements and multiple endings.
 - **Help System:** In-game help commands to guide players with available actions.
+- **Game History:** The game keeps track of the player's actions and history to provide a personalized experience.
+- **ASCII Art:** The game uses ASCII art to enhance the retro-style interface.
 
 ## **Getting Started**
 
@@ -21,35 +23,37 @@ Before running the project, make sure you have the following installed:
 - **Node.js** (v14.x or later)
 - **npm** (v6.x or later)
 - **React** (v17.x or later)
-  
+
 ### **Installation**
 
 1. Clone the repository:
 
-    ```bash
-    git clone https://github.com/sanjaysah101/RetroAI-Quest
-    cd RetroAI-Quest
-    ```
+   ```bash
+   git clone https://github.com/sanjaysah101/RetroAI-Quest
+   cd RetroAI-Quest
+   ```
 
 2. Install dependencies:
 
-    ```bash
-    pnpm i
-    ```
+   ```bash
+   pnpm i
+   ```
 
 3. Start the development server:
 
-    ```bash
-    pnpm dev
-    ```
+   ```bash
+   pnpm dev
+   ```
 
 4. Open your browser and go to `http://localhost:5173`.
 
-### **Gameplay**
+## **Gameplay**
 
 Once the game is loaded, you will be greeted with a terminal-like interface. Type the available commands to begin your adventure.
 
-#### **Available Commands**
+You can find the game story [here](./GAME_STORY.md).
+
+## **Available Commands**
 
 - `game --start`: Start the game.
 - `game --end`: End the game.
@@ -62,33 +66,21 @@ Once the game is loaded, you will be greeted with a terminal-like interface. Typ
 - `inventory`: Check your current inventory.
 - `clear`: Clear the terminal.
 
-### **Sample Commands**
+## **Sample Commands**
 
-- Start your adventure:
+- Start your game:
 
-    ```cmd
-    game --start
-    ```
-
-- Look around:
-
-    ```cmd
-    look
-    ```
+  ```cmd
+  game
+  ```
 
 - Move to a new area:
 
-    ```cmd
-    go north
-    ```
+  ```cmd
+  go <path>
+  ```
 
-- Check your inventory:
-
-    ```cmd
-    inventory
-    ```
-
-### **How It Works**
+## **How It Works**
 
 The game engine is built with React and utilizes AI to dynamically generate stories and adapt to player input. The AI responds to commands in real-time and provides unique outcomes based on your decisions. The game's context includes:
 
