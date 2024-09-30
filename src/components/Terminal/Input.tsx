@@ -1,5 +1,6 @@
 import { FC, useEffect, useRef, useState } from "react";
 
+import { useTerminal } from "../../hooks/useTerminal";
 import CommandPrompt from "../CommandPrompt";
 
 interface InputProps {
@@ -8,9 +9,9 @@ interface InputProps {
 }
 
 const Input: FC<InputProps> = ({ onSubmit, isFocused }) => {
+  const { directory } = useTerminal();
   const textRef = useRef<HTMLTextAreaElement>(null);
   const [command, setCommand] = useState("");
-
   useEffect(() => {
     if (!isFocused) {
       textRef.current?.focus();
@@ -41,7 +42,7 @@ const Input: FC<InputProps> = ({ onSubmit, isFocused }) => {
           placeholder="Type a command..."
         />
         <div className="liner">
-          <CommandPrompt />
+          <CommandPrompt directory={directory} />
           <span>{command}</span>
           {isFocused && <b className="animate-blink opacity-0">█</b>}
         </div>

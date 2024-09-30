@@ -13,12 +13,29 @@ export const enum TerminalOutputType {
   INITIAL = "initial",
 }
 
-export type CommandActions<T> = { [key: string]: (arg: T[]) => Promise<History> };
+export type DirectoryInfo = {
+  isRootDirectory: boolean;
+  isHomeDirectory: boolean;
+  currentDirectory: string;
+};
+
+export interface CommandActionCallback {
+  command: string;
+  directoryInfo: DirectoryInfo;
+  terminalActions: {
+    changeDirectory: (newDirectory: string, showCommandExecution?: boolean) => void;
+    changeUsername: (newUsername: string) => void;
+    changeHostname: (newHostname: string) => void;
+  };
+}
+
+export type CommandActions = (args: CommandActionCallback) => Promise<History>;
 
 export interface History {
   command: string;
   output: string;
   type: TerminalOutputType;
+  directory: string;
 }
 
 export interface TerminalContextType {
@@ -26,36 +43,49 @@ export interface TerminalContextType {
   history: History[];
   username: string;
   hostname: string;
+  directory: string;
+  isLoading: boolean;
+  changeDirectory: (newDirectory: string) => void;
   handleCommand: (command: string) => void;
 }
 
 export enum TerminalCommand {
-  SET_USERNAME = "set username",
-  SET_HOSTNAME = "set hostname",
+  SET_USERNAME = "set username &lt;username&gt;",
+  SET_HOSTNAME = "set hostname &lt;hostname&gt;",
   CLEAR = "clear",
   HELP = "help",
+  CD = "cd directory",
+  LS = "ls",
 }
 
-export type TerminalCommandHelp = {
+export type Command = {
   command: string;
   description: string;
 };
 
-export const TerminalCommandHelp: Record<keyof typeof TerminalCommand, TerminalCommandHelp> = {
+export const TerminalCommandHelp: Record<keyof typeof TerminalCommand, Command> = {
   SET_USERNAME: {
-    command: "set username &lt;username&gt;",
+    command: TerminalCommand.SET_USERNAME,
     description: "Set the username",
   },
   SET_HOSTNAME: {
-    command: "set hostname &lt;hostname&gt;",
+    command: TerminalCommand.SET_HOSTNAME,
     description: "Set the hostname",
   },
   CLEAR: {
-    command: "clear",
+    command: TerminalCommand.CLEAR,
     description: "Clear the terminal",
   },
   HELP: {
-    command: "help",
+    command: TerminalCommand.HELP,
     description: "Show the help menu",
+  },
+  CD: {
+    command: TerminalCommand.CD,
+    description: "Change the current directory",
+  },
+  LS: {
+    command: TerminalCommand.LS,
+    description: "List the files in the current directory",
   },
 };

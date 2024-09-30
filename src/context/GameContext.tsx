@@ -1,100 +1,93 @@
 import { FC, createContext, useState } from "react";
 
-import { generateGameCredits, generateGameEnd, generateGameIntro, generateStartGame } from "../services/geminiAI";
+import { GameStory } from "../constants/game";
 import { GameCommands, GameContextType, GameHelpCommands, GameScenes, GameState } from "../types/game";
-import { History, TerminalOutputType } from "../types/terminal";
-import { formatHelpCommands } from "../utils";
+import { CommandActionCallback, History, TerminalOutputType } from "../types/terminal";
+import { checkTerminalCommand, formatHelpCommands } from "../utils";
 
-// Create GameContext
 export const GameContext = createContext<GameContextType | undefined>(undefined);
 
-// GameProvider component
 export const GameProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
   const [gameState, setGameState] = useState<GameState>({
     currentScene: GameCommands.INTRO,
     gameHistory: GameScenes[GameCommands.INTRO],
   });
+  const [gameAction, setGameAction] = useState<boolean>(true);
 
-  // Function to change scenes
-  const changeScene = (newScene: GameCommands) => {
+  const updateGameState = (arg: GameState) => {
     setGameState((prevState) => ({
       ...prevState,
-      currentScene: newScene,
+      ...arg,
     }));
   };
 
-  const startGame = async (): Promise<History> => {
-    const story = await generateStartGame();
-    setGameState((prevState) => ({
-      ...prevState,
-      currentScene: GameCommands.GAME,
-    }));
-    return {
-      command: "game --start",
-      output: story.split(".").join(".\n"),
-      type: TerminalOutputType.INFO,
-    };
-  };
-
-  const endGame = async (): Promise<History> => {
-    const story = await generateGameEnd();
-
-    setGameState((prevState) => ({
-      ...prevState,
-      currentScene: GameCommands.END,
-    }));
-    return {
-      command: "game --end",
-      output: story.split(".").join(".\n"),
-      type: TerminalOutputType.INFO,
-    };
-  };
-
-  const help = async (): Promise<History> => {
+  const help = async (args: CommandActionCallback): Promise<History> => {
+    console.log(args);
     return {
       command: "game --help",
       output: formatHelpCommands(Object.values(GameHelpCommands)),
       type: TerminalOutputType.INFO,
+      directory: "/",
     };
   };
 
-  const intro = async (): Promise<History> => {
-    const story = await generateGameIntro();
-    return {
-      command: "intro",
-      output: story.split(".").join(".\n"),
-      type: TerminalOutputType.INFO,
-    };
-  };
+  const game = async (args: CommandActionCallback): Promise<History> => {
+    const {
+      directoryInfo: { currentDirectory, isRootDirectory, isHomeDirectory },
+      terminalActions,
+    } = args;
 
-  const game = async (): Promise<History> => {
+    if (!isRootDirectory && !isHomeDirectory) {
+      throw new Error("You are not in the root directory");
+    }
+
+    terminalActions.changeDirectory("cd game");
+    setGameAction(false);
+
     return {
       command: "game",
-      output: "You enter the game. Please make a decision.",
+      output: GameStory.intro.join("\n"),
       type: TerminalOutputType.INFO,
+      directory: currentDirectory,
     };
   };
 
-  const credits = async (): Promise<History> => {
-    const story = await generateGameCredits();
+  const intro = async (args: CommandActionCallback): Promise<History> => {
     return {
-      command: "credits",
-      output: story.split(".").join(".\n"),
+      command: GameCommands.INTRO,
+      output: GameStory.intro.join("\n"),
       type: TerminalOutputType.INFO,
+      directory: args.directoryInfo.currentDirectory,
+    };
+  };
+
+  const gameActionMapper = async (args: CommandActionCallback): Promise<History> => {
+    if (checkTerminalCommand(args.command, [GameCommands.GAME])) {
+      return game(args);
+    }
+
+    if (checkTerminalCommand(args.command, [GameCommands.HELP], true)) {
+      return help(args);
+    }
+
+    if (checkTerminalCommand(args.command, [GameCommands.INTRO], true)) {
+      return intro(args);
+    }
+
+    return {
+      command: args.command,
+      output: "Invalid command",
+      type: TerminalOutputType.ERROR,
+      directory: args.directoryInfo.currentDirectory,
     };
   };
 
   const value = {
     gameState,
-    changeScene,
-    gameActions: {
-      [GameCommands.HELP]: help,
-      [GameCommands.START]: startGame,
-      [GameCommands.END]: endGame,
-      [GameCommands.INTRO]: intro,
-      [GameCommands.GAME]: game,
-      [GameCommands.CREDITS]: credits,
-    },
+    updateGameState,
+    gameActions: gameActionMapper,
+    gameAction,
+    setGameAction,
   };
 
   return <GameContext.Provider value={value}>{children}</GameContext.Provider>;

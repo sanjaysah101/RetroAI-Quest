@@ -1,32 +1,31 @@
 import React, { FC, createContext, useState } from "react";
 
+import { forestArt } from "../assets/asciiArt";
+import { GameStory } from "../constants/game";
+import { useGame } from "../hooks/useGame";
+import { generateAsciiArt, generateNewStoryline } from "../services/geminiAI";
 import {
-  generateAsciiArt,
-  generateGo,
-  generateNPCInteraction,
-  generateNewStoryline,
-  generateTreasureDiscovery,
-} from "../services/geminiAI";
-import {
+  DragonLairStory,
+  EldoriaStory,
+  ForestStory,
   PlayerActionsOnCommand,
   PlayerCommands,
   PlayerContextType,
-  PlayerDecision,
+  PlayerGoCommands,
   PlayerState,
 } from "../types/player";
-import { History, TerminalOutputType } from "../types/terminal";
+import { CommandActionCallback, History, TerminalOutputType } from "../types/terminal";
+import { checkTerminalCommand, generateRandomChoices } from "../utils";
 
 export const PlayerContext = createContext<PlayerContextType | null>(null);
 
-// Provide the context to wrap your components
 export const PlayerProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
   const [playerState, setPlayerState] = useState<PlayerState>({
     location: "starting point",
-    inventory: [] as string[],
-    decisions: [] as PlayerDecision[],
     playerActions: {} as PlayerActionsOnCommand,
-    hasSword: false,
   });
+
+  const { updateGameState, gameState } = useGame();
 
   const updatePlayerState = (newState: PlayerState[]) => {
     setPlayerState((prevState) => ({
@@ -35,103 +34,124 @@ export const PlayerProvider: FC<{ children: React.ReactNode }> = ({ children }) 
     }));
   };
 
-  const makeDecision = (decision: PlayerDecision) => {
-    setPlayerState((prevDecision) => ({
-      ...prevDecision,
-      decisions: [...(prevDecision.decisions || []), decision],
+  const go = async (args: CommandActionCallback): Promise<History> => {
+    const {
+      directoryInfo: { currentDirectory },
+      command,
+      terminalActions,
+    } = args;
+
+    const path = command.split(" ").pop();
+    let output = "";
+
+    if (currentDirectory !== "~/game") {
+      return {
+        command,
+        output: `To run <span class="text-blue-300">"${command}"</span>, you must be in the game.`,
+        type: TerminalOutputType.ERROR,
+        directory: currentDirectory,
+      };
+    }
+
+    if (path === PlayerGoCommands.DRAGON_LAIR) {
+      const dragonLairStory = generateRandomChoices(Object.values(DragonLairStory));
+      const asciiArt = await generateAsciiArt(dragonLairStory);
+
+      terminalActions.changeDirectory(`cd ${PlayerGoCommands.DRAGON_LAIR}`);
+      output = GameStory[dragonLairStory as keyof typeof GameStory]?.join("\n") + "\n\n" + asciiArt;
+    }
+
+    if (path === PlayerGoCommands.ELDORIA) {
+      const eldoriaStory = generateRandomChoices(Object.values(EldoriaStory));
+      const asciiArt = await generateAsciiArt(eldoriaStory);
+
+      terminalActions.changeDirectory(`cd ${PlayerGoCommands.ELDORIA}`);
+      output = GameStory[eldoriaStory as keyof typeof GameStory]?.join("\n") + "\n\n" + asciiArt;
+    }
+
+    if (path === PlayerGoCommands.FOREST) {
+      const forestStory = generateRandomChoices(Object.values(ForestStory));
+
+      terminalActions.changeDirectory(`cd ${PlayerGoCommands.FOREST}`);
+      output = GameStory[forestStory as keyof typeof GameStory]?.join("\n") + "\n\n" + forestArt;
+    }
+
+    if (output === "") {
+      return {
+        command,
+        output: `You must be in the game to perform this action.`,
+        type: TerminalOutputType.ERROR,
+        directory: currentDirectory,
+      };
+    }
+
+    setPlayerState((prev) => ({
+      ...prev,
+      location: `${args.directoryInfo.currentDirectory}/${path}`,
     }));
-  };
 
-  const addItemToInventory = (item: string) => {
-    setPlayerState((prevState) => ({
-      ...prevState,
-      inventory: [...(prevState.inventory || []), item],
-    }));
-  };
-
-  const look = async (): Promise<History> => {
-    const response = await generateNewStoryline(playerState);
-    const asciiArt = await generateAsciiArt("player location");
-
-    return {
-      command: "look",
-      output: response + "\n\n" + asciiArt,
+    const historyEntry = {
+      command,
+      output,
       type: TerminalOutputType.INFO,
+      directory: `${args.directoryInfo.currentDirectory}/${path}`,
     };
-  };
 
-  const go = async (direction: string[]): Promise<History> => {
-    const response = await generateGo(playerState);
-    return {
-      command: `go ${direction}`,
-      output: response,
-      type: TerminalOutputType.INFO,
-    };
-  };
+    updateGameState({
+      gameHistory: [historyEntry],
+    });
 
-  const inventory = async (): Promise<History> => {
-    const response = await generateTreasureDiscovery(playerState, "sword");
-    const asciiArt = await generateAsciiArt("player inventory");
-
-    return {
-      command: "inventory",
-      output: response + "\n\n" + asciiArt + `\nCurrent inventory: ${playerState.inventory?.join(", ") || "None"}`,
-      type: TerminalOutputType.INFO,
-    };
-  };
-
-  const pickup = async (item: string[]): Promise<History> => {
-    updatePlayerState([{ hasSword: true }]);
-
-    return {
-      command: "pickup",
-      output: `You picked up ${item}`,
-      type: TerminalOutputType.INFO,
-    };
-  };
-
-  const drop = async (item: string[]): Promise<History> => {
-    return {
-      command: "drop",
-      output: `You dropped ${item}`,
-      type: TerminalOutputType.INFO,
-    };
-  };
-
-  const use = async (item: string[]): Promise<History> => {
-    console.log(item);
-    return {
-      command: "use",
-      output: `You used ${item}`,
-      type: TerminalOutputType.INFO,
-    };
+    return historyEntry;
   };
 
   const help = async (): Promise<History> => {
-    const response = await generateNPCInteraction("retro", "knight");
     return {
       command: "user --help",
-      output: response,
+      output: "response",
       type: TerminalOutputType.INFO,
+      directory: playerState.location || "",
     };
   };
 
-  const playerActions: PlayerActionsOnCommand = {
-    [PlayerCommands.LOOK]: look,
-    [PlayerCommands.INVENTORY]: inventory,
-    [PlayerCommands.GO]: go,
-    [PlayerCommands.PICKUP]: pickup,
-    [PlayerCommands.DROP]: drop,
-    [PlayerCommands.USE]: use,
-    [PlayerCommands.HELP]: help,
+  const playerActionMapper = async (args: CommandActionCallback): Promise<History> => {
+    const {
+      directoryInfo: { currentDirectory },
+    } = args;
+
+    if (checkTerminalCommand(args.command, [PlayerCommands.GO])) {
+      return go(args);
+    }
+
+    if (checkTerminalCommand(args.command, [PlayerCommands.HELP], true)) {
+      return help();
+    }
+
+    console.log({ currentDirectory, l: playerState.location });
+
+    if (currentDirectory !== playerState.location) {
+      return {
+        command: args.command,
+        output: "You must be in the game to perform this action.",
+        type: TerminalOutputType.ERROR,
+        directory: args.directoryInfo.currentDirectory,
+      };
+    }
+
+    const newStoryline = await generateNewStoryline(gameState.gameHistory, args.command);
+    const asciiArt = await generateAsciiArt(newStoryline.join("\n"));
+
+    return {
+      command: args.command,
+      output: newStoryline.join("\n") + "\n\n" + asciiArt,
+      type: TerminalOutputType.INFO,
+      directory: args.directoryInfo.currentDirectory,
+    };
   };
 
   const value = {
     playerState,
     updatePlayerState,
-    makeDecision,
-    addItemToInventory,
-    playerActions,
+    playerActions: playerActionMapper,
   };
 
   return <PlayerContext.Provider value={value}>{children}</PlayerContext.Provider>;
