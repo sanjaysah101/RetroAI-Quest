@@ -111,6 +111,10 @@ Feel free to contribute to the project by:
 2. Creating a new branch for your feature.
 3. Submitting a pull request with a detailed description of your changes.
 
+### Our Contributors
+
+[![Contributors](https://contrib.rocks/image?repo=sanjaysah101/RetroAI-Quest)](https://github.com/sanjaysah101/RetroAI-Quest.git)
+
 ## **Contact**
 
 If you have any questions or feedback, feel free to reach out:
