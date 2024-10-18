@@ -24,7 +24,7 @@ function App() {
 const GameTerminal = () => {
   const { gameState, gameActions, gameAction } = useGame();
   const { playerActions } = usePlayer();
-
+ 
   return (
     <TerminalProvider
       commandActions={gameAction ? gameActions : playerActions}

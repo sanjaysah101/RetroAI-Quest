@@ -45,7 +45,7 @@ export const GameScenes: Record<GameCommands, History[]> = {
       command: "IntroScene",
       output: [
         `Welcome to the game`,
-        retroAIArt,
+        `<span class='text-sm'> ${retroAIArt} </span>`,
         "<span class='text-[#B89076]'>Hostname set to </span>" + "<span class='text-blue-300'>retro.ai</span>",
         "<span class='text-[#B89076]'>Username seat to </span>" + "<span class='text-blue-300'>sanjay</span>",
         `<span class="text-[#B89076]">To Play game, type </span> - <span class="text-blue-300">game</span>`,
